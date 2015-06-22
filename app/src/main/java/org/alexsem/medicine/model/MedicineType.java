@@ -10,7 +10,7 @@ import org.json.JSONObject;
 public class MedicineType {
 
     private long id;
-    private String name;
+    private String type;
     private String unit;
     private boolean measurable;
 
@@ -22,12 +22,12 @@ public class MedicineType {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getUnit() {
@@ -55,7 +55,7 @@ public class MedicineType {
     public static MedicineType fromJSON(JSONObject json) throws JSONException {
         MedicineType type = new MedicineType();
         type.setId(json.getLong("id"));
-        type.setName(json.getString("name"));
+        type.setType(json.getString("type"));
         type.setUnit(json.getString("unit"));
         type.setMeasurable(json.getBoolean("measurable"));
         return type;

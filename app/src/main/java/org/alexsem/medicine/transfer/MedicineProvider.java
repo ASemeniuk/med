@@ -75,7 +75,7 @@ public class MedicineProvider extends ContentProvider {
     public static final class MedicineType {
         public static final String _T = "MedType";
         public static final String ID = "_id";
-        public static final String NAME = "name";
+        public static final String TYPE = "type";
         public static final String UNIT = "unit";
         public static final String MEASURABLE = "measurable";
 
@@ -136,20 +136,29 @@ public class MedicineProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         SQLiteDatabase db = mHelper.getWritableDatabase();
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        List<String> segments;
 
         switch (uriMatcher.match(uri)) {
             case MEDICINE_ALL:
-                queryBuilder.setTables(Medicine._T);
+                queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
                 selection = null;
                 selectionArgs = null;
                 sortOrder = String.format("%s collate nocase", Medicine.NAME);
+                for (int i = 0; i < projection.length; i++) {
+                    if (projection[i].equals(Medicine.ID)) {
+                        projection[i] = String.format("%s.%s", Medicine._T, Medicine.ID);
+                    }
+                }
                 break;
             case MEDICINE_TYPE:
-                queryBuilder.setTables(Medicine._T);
+                queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
                 selection = (String.format("%s = ?", Medicine.TYPE_ID));
                 selectionArgs = new String[]{uri.getLastPathSegment()};
                 sortOrder = String.format("%s collate nocase", Medicine.NAME);
+                for (int i = 0; i < projection.length; i++) {
+                    if (projection[i].equals(Medicine.ID)) {
+                        projection[i] = String.format("%s.%s", Medicine._T, Medicine.ID);
+                    }
+                }
                 break;
             case MEDICINE_SINGLE:
                 queryBuilder.setTables(Medicine._T);
