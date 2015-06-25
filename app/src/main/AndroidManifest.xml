@@ -8,14 +8,16 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".activity.MainActivity"
-            android:configChanges="keyboardHidden|screenSize"
-            android:screenOrientation="portrait">
+            android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activity.EditActivity"
+            android:windowSoftInputMode="adjustPan"/>
 
         <provider
             android:name=".transfer.MedicineProvider"

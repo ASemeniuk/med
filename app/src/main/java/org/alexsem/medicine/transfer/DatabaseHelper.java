@@ -15,14 +15,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE Medicine (_id INTEGER PRIMARY KEY, name TEXT, description TEXT, typeId INTEGER, amount INTEGER, expireAt TEXT);");
         db.execSQL("CREATE TABLE MedType  (_id INTEGER PRIMARY KEY, type TEXT, unit TEXT, measurable INTEGER);");
 
-        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('таблетки', 'шт.', 1)");
-        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('пакеты', 'шт.', 1)");
-        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('капсулы', 'шт.', 1)");
-        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('ампулы', 'шт.', 1)");
-        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('монодозы', 'шт.', 1)");
-        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('капли', 'мл', 0)");
-        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('спрей', 'мл', 0)");
-        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('раствор', 'мл', 0)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('С‚Р°Р±Р»РµС‚РєРё', 'С€С‚.', 1)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('РїР°РєРµС‚С‹', 'С€С‚.', 1)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('РєР°РїСЃСѓР»С‹', 'С€С‚.', 1)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('Р°РјРїСѓР»С‹', 'С€С‚.', 1)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('РјРѕРЅРѕРґРѕР·С‹', 'С€С‚.', 1)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('РєР°РїР»Рё', 'РјР»', 0)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('СЃРїСЂРµР№', 'РјР»', 0)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('СЂР°СЃС‚РІРѕСЂ', 'РјР»', 0)");
     }
 
     @Override

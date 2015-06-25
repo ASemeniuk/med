@@ -3,4 +3,11 @@
 
     <string name="medicine_empty">Отсутствуют данные для отображения</string>
 
+    <string name="edit_name">Название:</string>
+    <string name="edit_type">Тип:</string>
+    <string name="edit_amount">Количество:</string>
+    <string name="edit_expiration">Срок годности:</string>
+    <string name="edit_description">Описание:</string>
+
+
 </resources>

@@ -101,7 +101,7 @@ public class MedicineProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, "medicine/type/#", MEDICINE_TYPE);
         uriMatcher.addURI(AUTHORITY, "medicine/#", MEDICINE_SINGLE);
 
-        uriMatcher.addURI(AUTHORITY, "medtype", MEDICINE_ALL);
+        uriMatcher.addURI(AUTHORITY, "medtype", MEDTYPE_ALL);
         uriMatcher.addURI(AUTHORITY, "medtype/#", MEDTYPE_SINGLE);
     }
 
