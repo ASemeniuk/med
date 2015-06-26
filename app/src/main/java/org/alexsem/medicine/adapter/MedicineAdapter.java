@@ -39,11 +39,9 @@ public class MedicineAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder holder = (ViewHolder) view.getTag();
         holder.getName().setText(cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.NAME)));
-        holder.getType().setText(cursor.getString(cursor.getColumnIndex(MedicineProvider.MedicineType.TYPE)));
-        holder.getAmount().setText(String.format("%s %s",
-                cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.AMOUNT)),
-                cursor.getString(cursor.getColumnIndex(MedicineProvider.MedicineType.TYPE))
-        ));
+        holder.getType().setText(String.format("(%s)", cursor.getString(cursor.getColumnIndex(MedicineProvider.MedicineType.TYPE))));
+        holder.getAmount().setText(String.valueOf(cursor.getInt(cursor.getColumnIndex(MedicineProvider.Medicine.AMOUNT))));
+        holder.getUnit().setText(cursor.getString(cursor.getColumnIndex(MedicineProvider.MedicineType.UNIT)));
         try {
             holder.getExpiration().setText(String.format("%1$tb %1$tY",
                     MedicineProvider.parseExpireDate(cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.EXPIRATION)))
@@ -64,6 +62,7 @@ public class MedicineAdapter extends CursorAdapter {
         private TextView name = null;
         private TextView type = null;
         private TextView amount = null;
+        private TextView unit = null;
         private TextView expiration = null;
 
         /**
@@ -93,6 +92,13 @@ public class MedicineAdapter extends CursorAdapter {
                 amount = (TextView) base.findViewById(R.id.medicine_amount);
             }
             return (amount);
+        }
+
+        public TextView getUnit() {
+            if (unit == null) {
+                unit = (TextView) base.findViewById(R.id.medicine_unit);
+            }
+            return (unit);
         }
 
         public TextView getExpiration() {

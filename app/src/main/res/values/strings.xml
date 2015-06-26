@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Medicine</string>
 
+    <string name="action_done">Готово</string>
+
     <string name="medicine_empty">Отсутствуют данные для отображения</string>
 
     <string name="edit_name">Название:</string>
@@ -8,6 +10,8 @@
     <string name="edit_amount">Количество:</string>
     <string name="edit_expiration">Срок годности:</string>
     <string name="edit_description">Описание:</string>
+    <string name="edit_error_name">Название не может быть пустым</string>
+    <string name="edit_success">Сохранено</string>
 
 
 </resources>

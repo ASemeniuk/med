@@ -8,6 +8,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.alexsem.medicine.R;
@@ -26,6 +27,14 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new MedicineAdapter(this, null);
         ListView list = (ListView) findViewById(android.R.id.list);
         list.setEmptyView(findViewById(android.R.id.empty));
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(MainActivity.this, EditActivity.class);
+                intent.putExtra(EditActivity.EXTRA_MEDICINE_ID, id);
+                startActivity(intent);
+            }
+        });
         list.setAdapter(mAdapter);
 
         findViewById(R.id.main_add).setOnClickListener(new View.OnClickListener() {
