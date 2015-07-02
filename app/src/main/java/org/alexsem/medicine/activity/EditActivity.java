@@ -55,7 +55,7 @@ public class EditActivity extends AppCompatActivity {
         mUnit = (TextView) findViewById(R.id.edit_unit);
         mDescription = (EditText) findViewById(R.id.edit_description);
         mExpiration = (TextView) findViewById(R.id.edit_expiration);
-        mExpiration.setBackgroundDrawable(mName.getBackground());
+        mExpiration.setBackgroundDrawable(mName.getBackground().getConstantState().newDrawable());
         mExpiration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
