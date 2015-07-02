@@ -12,6 +12,7 @@ import org.alexsem.medicine.R;
 import org.alexsem.medicine.transfer.MedicineProvider;
 
 import java.text.ParseException;
+import java.util.Date;
 
 
 /**
@@ -43,9 +44,10 @@ public class MedicineAdapter extends CursorAdapter {
         holder.getAmount().setText(String.valueOf(cursor.getInt(cursor.getColumnIndex(MedicineProvider.Medicine.AMOUNT))));
         holder.getUnit().setText(cursor.getString(cursor.getColumnIndex(MedicineProvider.MedicineType.UNIT)));
         try {
-            holder.getExpiration().setText(String.format("%1$tb %1$tY",
-                    MedicineProvider.parseExpireDate(cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.EXPIRATION)))
-            ));
+            String date = cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.EXPIRATION));
+            String now = MedicineProvider.formatExpireDate(new Date());
+            view.getBackground().setLevel(now.compareTo(date) > 0 ? 2 : now.equals(date) ? 1 : 0);
+            holder.getExpiration().setText(String.format("%1$tb. %1$tY", MedicineProvider.parseExpireDate(date)));
         } catch (ParseException e) {
             holder.getExpiration().setText("");
         }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="@color/accent_light"/>
+        </shape>
+    </item>
+    <item>
+        <level-list>
+            <item android:maxLevel="0">
+                <shape>
+                    <solid android:color="@android:color/transparent"/>
+                </shape>
+            </item>
+            <item android:maxLevel="1">
+                <shape>
+                    <solid android:color="#FFF59D"/>
+                </shape>
+            </item>
+            <item android:maxLevel="2">
+                <shape>
+                    <solid android:color="#FFAB91"/>
+                </shape>
+            </item>
+        </level-list>
+    </item>
+</selector>

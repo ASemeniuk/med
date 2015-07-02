@@ -2,14 +2,22 @@ package org.alexsem.medicine.activity;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
+
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
 
 import org.alexsem.medicine.R;
 import org.alexsem.medicine.adapter.MedicineAdapter;
@@ -25,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main);
 
         mAdapter = new MedicineAdapter(this, null);
-        ListView list = (ListView) findViewById(android.R.id.list);
+        SwipeMenuListView list = (SwipeMenuListView) findViewById(android.R.id.list);
         list.setEmptyView(findViewById(android.R.id.empty));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -35,7 +43,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        list.setMenuCreator(mSwipeMenuCreator);
+        list.setOnMenuItemClickListener(mSwipeMenuClickListener);
         list.setAdapter(mAdapter);
+        registerForContextMenu(list);
 
         findViewById(R.id.main_add).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,6 +58,57 @@ public class MainActivity extends AppCompatActivity {
         getSupportLoaderManager().initLoader(0, null, mLoaderCallbacks);
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        switch (v.getId()) {
+            case android.R.id.list:
+                menu.add(Menu.NONE, 0, 0, R.string.action_delete);
+                break;
+            default:
+                super.onCreateContextMenu(menu, v, menuInfo);
+                break;
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case 0: //Delete
+                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                Uri uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_URI, String.valueOf(info.id));
+                getContentResolver().delete(uri, null, null);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    private SwipeMenuCreator mSwipeMenuCreator = new SwipeMenuCreator() {
+
+        @Override
+        public void create(SwipeMenu menu) {
+            SwipeMenuItem deleteItem = new SwipeMenuItem(MainActivity.this);
+            deleteItem.setBackground(getResources().getDrawable(R.drawable.selector_accent));
+            deleteItem.setWidth(getResources().getDimensionPixelSize(R.dimen.list_action_width));
+            deleteItem.setIcon(R.drawable.ic_delete);
+            menu.addMenuItem(deleteItem);
+        }
+    };
+
+    private SwipeMenuListView.OnMenuItemClickListener mSwipeMenuClickListener = new SwipeMenuListView.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+            switch (index) {
+                case 0: //Delete
+                    Uri uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_URI, String.valueOf(mAdapter.getItemId(position)));
+                    getContentResolver().delete(uri, null, null);
+                    break;
+            }
+            return false;
+        }
+    };
 
     //----------------------------------------------------------------------------------------------
 
