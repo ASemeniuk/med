@@ -14,5 +14,8 @@
     <string name="edit_error_name">Название не может быть пустым</string>
     <string name="edit_success">Сохранено</string>
 
+    <string name="notification_near">Срок истекает:\n</string>
+    <string name="notification_expired">Просрочены!:\n</string>
+
 
 </resources>

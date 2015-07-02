@@ -21,6 +21,7 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 
 import org.alexsem.medicine.R;
 import org.alexsem.medicine.adapter.MedicineAdapter;
+import org.alexsem.medicine.notification.NotificationService;
 import org.alexsem.medicine.transfer.MedicineProvider;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, EditActivity.class));
             }
         });
+
+        Intent updateIntent = new Intent(this, NotificationService.class);
+        updateIntent.putExtra("noupdate", true);
+        startService(updateIntent);
 
         getSupportLoaderManager().initLoader(0, null, mLoaderCallbacks);
     }
@@ -115,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
     private LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+            Uri uri = MedicineProvider.Medicine.CONTENT_URI;
             String[] projection = {
                     MedicineProvider.Medicine.ID,
                     MedicineProvider.Medicine.NAME,
@@ -125,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                     MedicineProvider.MedicineType.UNIT,
                     MedicineProvider.MedicineType.MEASURABLE
             };
-            return new CursorLoader(MainActivity.this, MedicineProvider.Medicine.CONTENT_URI, projection, null, null, null);
+            return new CursorLoader(MainActivity.this, uri, projection, null, null, null);
         }
 
         @Override

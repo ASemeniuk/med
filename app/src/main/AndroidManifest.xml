@@ -24,6 +24,17 @@
             android:authorities="org.alexsem.medicine"
             android:exported="false"/>
 
+        <service
+            android:name=".notification.NotificationService"
+            android:enabled="true" />
+        <receiver
+            android:name=".notification.AlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="org.alexsem.medicine.ACTION_ALARM" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
