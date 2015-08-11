@@ -16,8 +16,10 @@ import java.util.Date;
 public class Medicine implements Comparable<Medicine> {
 
     private long id;
+    private long groupId;
     private String name;
     private String description;
+    private String link;
     private long typeId;
     private int amount;
     private Date expireAt;
@@ -28,6 +30,14 @@ public class Medicine implements Comparable<Medicine> {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
     }
 
     public String getName() {
@@ -44,6 +54,14 @@ public class Medicine implements Comparable<Medicine> {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 
     public long getTypeId() {
@@ -76,6 +94,24 @@ public class Medicine implements Comparable<Medicine> {
     }
 
     /**
+     * Converts Medicine object top JSONObject
+     * @return Generated JSON
+     * @throws JSONException in case JSON formatting fails
+     */
+    public JSONObject toJSON() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("id", id);
+        json.put("groupId", groupId);
+        json.put("name", name);
+        json.put("description", description);
+        json.put("link", link);
+        json.put("typeId", typeId);
+        json.put("amount", amount);
+        json.put("expireAt", MedicineProvider.formatExpireDate(expireAt));
+        return json;
+    }
+
+    /**
      * Parses Medicine object from JSONObject
      * @param json JSONObject to parse
      * @return parsed object
@@ -85,8 +121,10 @@ public class Medicine implements Comparable<Medicine> {
     public static Medicine fromJSON(JSONObject json) throws JSONException, ParseException {
         Medicine medicine = new Medicine();
         medicine.setId(json.getLong("id"));
+        medicine.setGroupId(json.getLong("groupId"));
         medicine.setName(json.getString("name"));
         medicine.setDescription(json.getString("description"));
+        medicine.setDescription(json.getString("link"));
         medicine.setTypeId(json.getLong("typeId"));
         medicine.setAmount(json.getInt("amount"));
         medicine.setExpireAt(MedicineProvider.parseExpireDate(json.getString("expireAt")));

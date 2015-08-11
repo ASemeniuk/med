@@ -40,6 +40,7 @@ public class EditActivity extends AppCompatActivity {
     private TextView mUnit;
     private TextView mExpiration;
     private EditText mDescription;
+    private EditText mLink;
 
     private MedicineTypeAdapter mTypeAdapter;
 
@@ -54,6 +55,7 @@ public class EditActivity extends AppCompatActivity {
         mAmount = (EditText) findViewById(R.id.edit_amount);
         mUnit = (TextView) findViewById(R.id.edit_unit);
         mDescription = (EditText) findViewById(R.id.edit_description);
+        mLink = (EditText) findViewById(R.id.edit_link);
         mExpiration = (TextView) findViewById(R.id.edit_expiration);
         mExpiration.setBackgroundDrawable(mName.getBackground().getConstantState().newDrawable());
         mExpiration.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +107,7 @@ public class EditActivity extends AppCompatActivity {
             mUnit.setText(savedInstanceState.getString("unit"));
             mExpiration.setText(savedInstanceState.getString("expiration"));
             mDescription.setText(savedInstanceState.getString("description"));
+            mLink.setText(savedInstanceState.getString("link"));
         } else if (getIntent().hasExtra(EXTRA_MEDICINE_ID)) {
             getSupportLoaderManager().initLoader(0, getIntent().getExtras(), mLoaderCallbacks);
         } else {
@@ -130,7 +133,9 @@ public class EditActivity extends AppCompatActivity {
                 } else {
                     ContentValues values = new ContentValues();
                     values.put(MedicineProvider.Medicine.NAME, mName.getText().toString());
+                    values.put(MedicineProvider.Medicine.GROUP_ID, 1); //TODO change
                     values.put(MedicineProvider.Medicine.DESCRIPTION, mDescription.getText().toString());
+                    values.put(MedicineProvider.Medicine.LINK, mLink.getText().toString());
                     values.put(MedicineProvider.Medicine.TYPE_ID, mType.getSelectedItemId());
                     int amount;
                     try {
@@ -169,6 +174,7 @@ public class EditActivity extends AppCompatActivity {
         outState.putString("unit", mUnit.getText().toString());
         outState.putString("expiration", mExpiration.getText().toString());
         outState.putString("description", mDescription.getText().toString());
+        outState.putString("link", mLink.getText().toString());
         super.onSaveInstanceState(outState);
     }
 
@@ -197,7 +203,8 @@ public class EditActivity extends AppCompatActivity {
                     MedicineProvider.Medicine.TYPE_ID,
                     MedicineProvider.Medicine.AMOUNT,
                     MedicineProvider.Medicine.EXPIRATION,
-                    MedicineProvider.Medicine.DESCRIPTION
+                    MedicineProvider.Medicine.DESCRIPTION,
+                    MedicineProvider.Medicine.LINK
             };
             return new CursorLoader(EditActivity.this, uri, projection, null, null, null);
         }
@@ -224,6 +231,7 @@ public class EditActivity extends AppCompatActivity {
                     }
                     mExpiration.setText(EXPIRATION_FORMAT.format(date));
                     mDescription.setText(data.getString(data.getColumnIndex(MedicineProvider.Medicine.DESCRIPTION)));
+                    mLink.setText(data.getString(data.getColumnIndex(MedicineProvider.Medicine.DESCRIPTION)));
                 }
             } finally {
                 data.close();
@@ -232,7 +240,6 @@ public class EditActivity extends AppCompatActivity {
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
-
         }
     };
 }

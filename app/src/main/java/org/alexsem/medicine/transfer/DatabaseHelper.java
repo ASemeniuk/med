@@ -12,8 +12,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE Medicine (_id INTEGER PRIMARY KEY, name TEXT, description TEXT, typeId INTEGER, amount INTEGER, expireAt TEXT);");
+        db.execSQL("CREATE TABLE Medicine (_id INTEGER PRIMARY KEY, groupId INTEGER, name TEXT, description TEXT, link TEXT, typeId INTEGER, amount INTEGER, expireAt TEXT);");
         db.execSQL("CREATE TABLE MedType  (_id INTEGER PRIMARY KEY, type TEXT, unit TEXT, measurable INTEGER);");
+        db.execSQL("CREATE TABLE MedGroup (_id INTEGER PRIMARY KEY, name TEXT, ord INTEGER);");
 
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('таблетки', 'шт.', 1)");
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('пакеты', 'шт.', 1)");
@@ -36,6 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             updated = true;
         }
         if (!updated) { //Other cases
+            db.execSQL("DROP TABLE IF EXISTS MedGroup");
             db.execSQL("DROP TABLE IF EXISTS MedType");
             db.execSQL("DROP TABLE IF EXISTS Medicine");
             onCreate(db);

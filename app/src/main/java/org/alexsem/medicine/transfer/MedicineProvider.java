@@ -63,8 +63,10 @@ public class MedicineProvider extends ContentProvider {
     public static final class Medicine {
         public static final String _T = "Medicine";
         public static final String ID = "_id";
+        public static final String GROUP_ID = "groupId";
         public static final String NAME = "name";
         public static final String DESCRIPTION = "description";
+        public static final String LINK = "link";
         public static final String TYPE_ID = "typeId";
         public static final String AMOUNT = "amount";
         public static final String EXPIRATION = "expireAt";
@@ -82,15 +84,27 @@ public class MedicineProvider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/medtype");
     }
 
+    public static final class MedicineGroup {
+        public static final String _T = "MedGroup";
+        public static final String ID = "_id";
+        public static final String NAME = "name";
+        public static final String ORDER = "ord";
+
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/medgroup");
+    }
+
     //--------------------------------------------------------------------------------------------------------------------
 
     private DatabaseHelper mHelper;
 
     private static final int MEDICINE_ALL = 11;
     private static final int MEDICINE_TYPE = 12;
-    private static final int MEDICINE_SINGLE = 13;
+    private static final int MEDICINE_GROUP = 13;
+    private static final int MEDICINE_SINGLE = 14;
     private static final int MEDTYPE_ALL = 21;
     private static final int MEDTYPE_SINGLE = 22;
+    private static final int MEDGROUP_ALL = 31;
+    private static final int MEDGROUP_SINGLE = 32;
 
     private static final UriMatcher uriMatcher;
 
@@ -99,10 +113,14 @@ public class MedicineProvider extends ContentProvider {
 
         uriMatcher.addURI(AUTHORITY, "medicine", MEDICINE_ALL);
         uriMatcher.addURI(AUTHORITY, "medicine/type/#", MEDICINE_TYPE);
+        uriMatcher.addURI(AUTHORITY, "medicine/group/#", MEDICINE_GROUP);
         uriMatcher.addURI(AUTHORITY, "medicine/#", MEDICINE_SINGLE);
 
         uriMatcher.addURI(AUTHORITY, "medtype", MEDTYPE_ALL);
         uriMatcher.addURI(AUTHORITY, "medtype/#", MEDTYPE_SINGLE);
+
+        uriMatcher.addURI(AUTHORITY, "medgroup", MEDGROUP_ALL);
+        uriMatcher.addURI(AUTHORITY, "medgroup/#", MEDGROUP_SINGLE);
     }
 
     @Override
@@ -118,6 +136,7 @@ public class MedicineProvider extends ContentProvider {
         switch (uriMatcher.match(uri)) {
             case MEDICINE_ALL:
             case MEDICINE_TYPE:
+            case MEDICINE_GROUP:
                 return String.format("vnd.android.cursor.dir/vnd.%s.medicine", AUTHORITY);
             case MEDICINE_SINGLE:
                 return String.format("vnd.android.cursor.item/vnd.%s.medicine", AUTHORITY);
@@ -125,6 +144,10 @@ public class MedicineProvider extends ContentProvider {
                 return String.format("vnd.android.cursor.dir/vnd.%s.medtype", AUTHORITY);
             case MEDTYPE_SINGLE:
                 return String.format("vnd.android.cursor.item/vnd.%s.medtype", AUTHORITY);
+            case MEDGROUP_ALL:
+                return String.format("vnd.android.cursor.dir/vnd.%s.medgroup", AUTHORITY);
+            case MEDGROUP_SINGLE:
+                return String.format("vnd.android.cursor.item/vnd.%s.medgroup", AUTHORITY);
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
@@ -160,6 +183,17 @@ public class MedicineProvider extends ContentProvider {
                     }
                 }
                 break;
+            case MEDICINE_GROUP:
+                queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
+                selection = (String.format("%s = ?", Medicine.GROUP_ID));
+                selectionArgs = new String[]{uri.getLastPathSegment()};
+                sortOrder = String.format("%s collate nocase", Medicine.NAME);
+                for (int i = 0; i < projection.length; i++) {
+                    if (projection[i].equals(Medicine.ID)) {
+                        projection[i] = String.format("%s.%s", Medicine._T, Medicine.ID);
+                    }
+                }
+                break;
             case MEDICINE_SINGLE:
                 queryBuilder.setTables(Medicine._T);
                 selection = (String.format("%s = ?", Medicine.ID));
@@ -171,11 +205,24 @@ public class MedicineProvider extends ContentProvider {
                 queryBuilder.setTables(MedicineType._T);
                 selection = null;
                 selectionArgs = null;
-                sortOrder = null;
+                sortOrder = MedicineType.TYPE;
                 break;
             case MEDTYPE_SINGLE:
                 queryBuilder.setTables(MedicineType._T);
                 selection = String.format("%s = ?", MedicineType.ID);
+                selectionArgs = new String[]{uri.getLastPathSegment()};
+                sortOrder = null;
+                break;
+
+            case MEDGROUP_ALL:
+                queryBuilder.setTables(MedicineGroup._T);
+                selection = null;
+                selectionArgs = null;
+                sortOrder = MedicineGroup.NAME;
+                break;
+            case MEDGROUP_SINGLE:
+                queryBuilder.setTables(MedicineGroup._T);
+                selection = String.format("%s = ?", MedicineGroup.ID);
                 selectionArgs = new String[]{uri.getLastPathSegment()};
                 sortOrder = null;
                 break;
@@ -202,6 +249,9 @@ public class MedicineProvider extends ContentProvider {
                 break;
             case MEDTYPE_ALL:
                 table = MedicineType._T;
+                break;
+            case MEDGROUP_ALL:
+                table = MedicineGroup._T;
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -230,6 +280,11 @@ public class MedicineProvider extends ContentProvider {
                 selection = (String.format("%s = ?", MedicineType.ID));
                 selectionArgs = new String[]{uri.getLastPathSegment()};
                 break;
+            case MEDGROUP_SINGLE:
+                table = MedicineGroup._T;
+                selection = (String.format("%s = ?", MedicineGroup.ID));
+                selectionArgs = new String[]{uri.getLastPathSegment()};
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
@@ -245,7 +300,6 @@ public class MedicineProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mHelper.getWritableDatabase();
         String table;
-        List<String> segments;
 
         switch (uriMatcher.match(uri)) {
             case MEDICINE_ALL:
@@ -267,6 +321,17 @@ public class MedicineProvider extends ContentProvider {
             case MEDTYPE_SINGLE:
                 table = MedicineType._T;
                 selection = String.format("%s = ?", MedicineType.ID);
+                selectionArgs = new String[]{uri.getLastPathSegment()};
+                break;
+
+            case MEDGROUP_ALL:
+                table = MedicineGroup._T;
+                selection = null;
+                selectionArgs = null;
+                break;
+            case MEDGROUP_SINGLE:
+                table = MedicineGroup._T;
+                selection = String.format("%s = ?", MedicineGroup.ID);
                 selectionArgs = new String[]{uri.getLastPathSegment()};
                 break;
 

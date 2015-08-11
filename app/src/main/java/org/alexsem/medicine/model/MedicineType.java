@@ -47,6 +47,20 @@ public class MedicineType {
     }
 
     /**
+     * Converts MedicineType object top JSONObject
+     * @return Generated JSON
+     * @throws JSONException in case JSON formatting fails
+     */
+    public JSONObject toJSON() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("id", id);
+        json.put("type", type);
+        json.put("unit", unit);
+        json.put("measurable", measurable);
+        return json;
+    }
+
+    /**
      * Parses MedicineType object from JSONObject
      * @param json JSONObject to parse
      * @return parsed object
