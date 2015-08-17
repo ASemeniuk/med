@@ -25,12 +25,27 @@
         <item>апрель</item>
         <item>май</item>
         <item>июнь</item>
-        <item>июдь</item>
+        <item>июль</item>
         <item>август</item>
         <item>сентябрь</item>
         <item>октябрь</item>
         <item>ноябрь</item>
         <item>декабрь</item>
+    </string-array>
+
+    <string-array name="medicine_months">
+        <item>янв</item>
+        <item>фев</item>
+        <item>мар</item>
+        <item>апр</item>
+        <item>май</item>
+        <item>июн</item>
+        <item>июл</item>
+        <item>авг</item>
+        <item>сен</item>
+        <item>окт</item>
+        <item>ноя</item>
+        <item>дек</item>
     </string-array>
 
 </resources>

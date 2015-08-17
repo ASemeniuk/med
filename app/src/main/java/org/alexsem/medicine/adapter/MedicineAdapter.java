@@ -12,6 +12,7 @@ import org.alexsem.medicine.R;
 import org.alexsem.medicine.transfer.MedicineProvider;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -22,10 +23,14 @@ import java.util.Date;
 public class MedicineAdapter extends CursorAdapter {
 
     private LayoutInflater mInflater;
+    private final String[] mMonths;
+    private final Calendar mNow;
 
     public MedicineAdapter(Context context, Cursor data) {
         super(context, data, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
         this.mInflater = LayoutInflater.from(context);
+        this.mMonths = context.getResources().getStringArray(R.array.medicine_months);
+        this.mNow = Calendar.getInstance();
     }
 
     @Override
@@ -47,7 +52,8 @@ public class MedicineAdapter extends CursorAdapter {
             String date = cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.EXPIRATION));
             String now = MedicineProvider.formatExpireDate(new Date());
             view.getBackground().setLevel(now.compareTo(date) > 0 ? 2 : now.equals(date) ? 1 : 0);
-            holder.getExpiration().setText(String.format("%1$tb. %1$tY", MedicineProvider.parseExpireDate(date)));
+            mNow.setTime(MedicineProvider.parseExpireDate(date));
+            holder.getExpiration().setText(String.format("%s. %04d", mMonths[mNow.get(Calendar.MONTH)], mNow.get(Calendar.YEAR)));
         } catch (ParseException e) {
             holder.getExpiration().setText("");
         }
