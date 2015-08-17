@@ -18,5 +18,19 @@
     <string name="notification_near">Срок истекает:\n</string>
     <string name="notification_expired">Просрочены!:\n</string>
 
+    <string-array name="edit_months">
+        <item>январь</item>
+        <item>февраль</item>
+        <item>март</item>
+        <item>апрель</item>
+        <item>май</item>
+        <item>июнь</item>
+        <item>июдь</item>
+        <item>август</item>
+        <item>сентябрь</item>
+        <item>октябрь</item>
+        <item>ноябрь</item>
+        <item>декабрь</item>
+    </string-array>
 
 </resources>

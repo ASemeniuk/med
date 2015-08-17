@@ -11,7 +11,6 @@ import android.widget.TextView;
 import org.alexsem.medicine.R;
 import org.alexsem.medicine.transfer.MedicineProvider;
 
-
 /**
  * Adapter for showing list of medicine types
  * @author Semeniuk A.D.

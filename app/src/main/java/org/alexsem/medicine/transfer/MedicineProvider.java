@@ -58,6 +58,16 @@ public class MedicineProvider extends ContentProvider {
         return result;
     }
 
+    /**
+     * Converts Date object to string representation
+     * @param month Month
+     * @param year Year
+     * @return Formatted string
+     */
+    public static String formatExpireDate(int month, int year) {
+        return String.format("%04d-%02d", year, month);
+    }
+
     //--------------------------------------------------------------------------------------------------------------------
 
     public static final class Medicine {

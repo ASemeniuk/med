@@ -21,13 +21,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('капсулы', 'шт.', 1)");
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('ампулы', 'шт.', 1)");
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('монодозы', 'шт.', 1)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('свечи', 'шт', 1)");
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('капли', 'мл', 0)");
-        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('свечи', 'мл', 0)");
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('спрей', 'мл', 0)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('сироп', 'мл', 0)");
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('раствор', 'мл', 0)");
-        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('мазь', 'мл', 0)");
-        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('гель', 'мл', 0)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('масло', 'мл', 0)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('мазь', 'г', 0)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('гель', 'г', 0)");
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('крем', 'мл', 0)");
+        db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('прочее', 'шт.', 1)");
     }
 
     @Override

@@ -33,7 +33,8 @@
         <Spinner
             android:id="@+id/edit_type"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -52,8 +53,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:inputType="number"
                 android:hint="0"
+                android:inputType="number"
                 android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <TextView
@@ -71,11 +72,27 @@
             android:text="@string/edit_expiration"
             android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-        <TextView
-            android:id="@+id/edit_expiration"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/edit_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="12dp"
+                android:layout_weight="1"
+                android:paddingTop="8dp"/>
+
+            <Spinner
+                android:id="@+id/edit_year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:paddingTop="8dp"/>
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -102,6 +119,7 @@
             android:id="@+id/edit_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="top"
             android:inputType="textMultiLine|textCapSentences"
             android:lines="2"
             android:textAppearance="?android:attr/textAppearanceMedium"/>

@@ -2,7 +2,9 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/app/src/main/java/org/alexsem/medicine/adapter/MedicineAdapter.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/org/alexsem/medicine/adapter/MedicineMonthAdapter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/org/alexsem/medicine/adapter/MedicineTypeAdapter.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/org/alexsem/medicine/adapter/MedicineYearAdapter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/org/alexsem/medicine/model/Medicine.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/org/alexsem/medicine/model/MedicineGroup.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/org/alexsem/medicine/model/MedicineType.java" charset="windows-1251" />
