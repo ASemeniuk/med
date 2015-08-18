@@ -17,7 +17,6 @@ public class MedicineGroup implements Comparable<MedicineGroup> {
 
     private long id;
     private String name;
-    private int order;
 
     public long getId() {
         return id;
@@ -35,14 +34,6 @@ public class MedicineGroup implements Comparable<MedicineGroup> {
         this.name = name;
     }
 
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
     @Override
     public int compareTo(@NonNull MedicineGroup group) {
         return this.name.compareTo(group.name);
@@ -57,7 +48,6 @@ public class MedicineGroup implements Comparable<MedicineGroup> {
         JSONObject json = new JSONObject();
         json.put("id", id);
         json.put("name", name);
-        json.put("order", order);
         return json;
     }
 
@@ -72,7 +62,6 @@ public class MedicineGroup implements Comparable<MedicineGroup> {
         MedicineGroup group = new MedicineGroup();
         group.setId(json.getLong("id"));
         group.setName(json.getString("name"));
-        group.setOrder(json.getInt("order"));
         return group;
     }
 }

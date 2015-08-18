@@ -53,7 +53,7 @@ public class MedicineAdapter extends CursorAdapter {
             String now = MedicineProvider.formatExpireDate(new Date());
             view.getBackground().setLevel(now.compareTo(date) > 0 ? 2 : now.equals(date) ? 1 : 0);
             mNow.setTime(MedicineProvider.parseExpireDate(date));
-            holder.getExpiration().setText(String.format("%s. %04d", mMonths[mNow.get(Calendar.MONTH)], mNow.get(Calendar.YEAR)));
+            holder.getExpiration().setText(String.format("%s %04d", mMonths[mNow.get(Calendar.MONTH)], mNow.get(Calendar.YEAR)));
         } catch (ParseException e) {
             holder.getExpiration().setText("");
         }

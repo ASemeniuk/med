@@ -26,6 +26,8 @@ import org.alexsem.medicine.transfer.MedicineProvider;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final int REQUEST_EDIT = 293;
+
     private MedicineAdapter mAdapter;
 
     @Override
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, EditActivity.class);
                 intent.putExtra(EditActivity.EXTRA_MEDICINE_ID, id);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_EDIT);
             }
         });
         list.setMenuCreator(mSwipeMenuCreator);
@@ -52,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, EditActivity.class));
+                startActivityForResult(new Intent(MainActivity.this, EditActivity.class), REQUEST_EDIT);
             }
         });
 
@@ -85,6 +87,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onContextItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_EDIT && resultCode == EditActivity.RESULT_GROUP_ADDED) {
+            //TODO handle group editing
         }
     }
 

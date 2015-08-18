@@ -14,7 +14,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE Medicine (_id INTEGER PRIMARY KEY, groupId INTEGER, name TEXT, description TEXT, link TEXT, typeId INTEGER, amount INTEGER, expireAt TEXT);");
         db.execSQL("CREATE TABLE MedType  (_id INTEGER PRIMARY KEY, type TEXT, unit TEXT, measurable INTEGER);");
-        db.execSQL("CREATE TABLE MedGroup (_id INTEGER PRIMARY KEY, name TEXT, ord INTEGER);");
+        db.execSQL("CREATE TABLE MedGroup (_id INTEGER PRIMARY KEY, name TEXT);");
 
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('таблетки', 'шт.', 1)");
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('пакеты', 'шт.', 1)");
@@ -31,6 +31,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('гель', 'г', 0)");
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('крем', 'мл', 0)");
         db.execSQL("INSERT INTO MedType (type, unit, measurable) VALUES ('прочее', 'шт.', 1)");
+
+        db.execSQL("INSERT INTO MedGroup (name) VALUES ('Общие')");
     }
 
     @Override

@@ -98,7 +98,6 @@ public class MedicineProvider extends ContentProvider {
         public static final String _T = "MedGroup";
         public static final String ID = "_id";
         public static final String NAME = "name";
-        public static final String ORDER = "ord";
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/medgroup");
     }

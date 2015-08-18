@@ -6,6 +6,8 @@
 
     <string name="medicine_empty">Отсутствуют данные для отображения</string>
 
+    <string name="edit_group">Группа:</string>
+    <string name="edit_group_add">Новая</string>
     <string name="edit_name">Название:</string>
     <string name="edit_type">Тип:</string>
     <string name="edit_amount">Количество:</string>
@@ -15,8 +17,14 @@
     <string name="edit_error_name">Название не может быть пустым</string>
     <string name="edit_success">Сохранено</string>
 
+    <string name="group_new">Новая группа</string>
+    <string name="group_remove">Удалить группу</string>
+
     <string name="notification_near">Срок истекает:\n</string>
     <string name="notification_expired">Просрочены!:\n</string>
+
+    <string name="dialog_add">Добавить</string>
+    <string name="dialog_cancel">Отмена</string>
 
     <string-array name="edit_months">
         <item>январь</item>

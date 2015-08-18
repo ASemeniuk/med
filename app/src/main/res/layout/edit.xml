@@ -13,6 +13,41 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/edit_group"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/edit_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="12dp"
+                android:layout_weight="1"
+                android:paddingTop="8dp"/>
+
+            <Button
+                style="@style/Widget.AppCompat.Button"
+                android:id="@+id/edit_group_add"
+                android:minHeight="1dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_plain"
+                android:gravity="center"
+                android:text="@string/edit_group_add"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:text="@string/edit_name"
             android:textAppearance="?android:attr/textAppearanceMedium"/>
 
@@ -20,7 +55,7 @@
             android:id="@+id/edit_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapWords"
+            android:inputType="textCapSentences"
             android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         <TextView
