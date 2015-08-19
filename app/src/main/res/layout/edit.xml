@@ -37,7 +37,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/button_plain"
-                android:gravity="center"
                 android:text="@string/edit_group_add"
                 android:textColor="@android:color/white"/>
 

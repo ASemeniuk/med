@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private final int LOADER_MEDICINE = 0;
     private final int LOADER_GROUP = 1;
 
+    private Button mGroupRemove;
     private MedicineAdapter mAdapter;
     private long mSelectedGroupId = -1;
 
@@ -56,6 +58,16 @@ public class MainActivity extends AppCompatActivity {
         list.setOnMenuItemClickListener(mSwipeMenuClickListener);
         list.setAdapter(mAdapter);
         registerForContextMenu(list);
+
+        mGroupRemove = (Button) findViewById(R.id.main_group_remove);
+        mGroupRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.withAppendedPath(MedicineProvider.MedicineGroup.CONTENT_URI, String.valueOf(mSelectedGroupId));
+                getContentResolver().delete(uri, null, null);
+                getSupportLoaderManager().restartLoader(LOADER_GROUP, null, mGroupLoaderCallbacks);
+            }
+        });
 
         findViewById(R.id.main_add).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                 Uri uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_URI, String.valueOf(info.id));
                 getContentResolver().delete(uri, null, null);
+                getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
                 return true;
             default:
                 return super.onContextItemSelected(item);
@@ -138,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 case 0: //Delete
                     Uri uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_URI, String.valueOf(mAdapter.getItemId(position)));
                     getContentResolver().delete(uri, null, null);
+                    getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
                     break;
             }
             return false;
@@ -187,11 +201,12 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
                     actionBar.removeAllTabs();
+                    long selectedGroupId = mSelectedGroupId;
                     do {
                         long id = cursor.getLong(cursor.getColumnIndex(MedicineProvider.Medicine.ID));
                         ActionBar.Tab tab = actionBar.newTab().setTag(id).setText(cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.NAME))).setTabListener(mGroupTabListener);
                         actionBar.addTab(tab);
-                        if (id == mSelectedGroupId) {
+                        if (id == selectedGroupId) {
                             tab.select();
                         }
                     } while (cursor.moveToNext());
@@ -228,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             mAdapter.swapCursor(cursor);
+            mGroupRemove.setVisibility(cursor.getCount() <= 0 && getSupportActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS ? View.VISIBLE : View.GONE);
         }
 
         @Override
