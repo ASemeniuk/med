@@ -82,6 +82,7 @@ public class MedicineProvider extends ContentProvider {
         public static final String EXPIRATION = "expireAt";
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/medicine");
+        public static final Uri CONTENT_GROUP_URI = Uri.parse("content://" + AUTHORITY + "/medicine/group");
     }
 
     public static final class MedicineType {
@@ -122,7 +123,7 @@ public class MedicineProvider extends ContentProvider {
 
         uriMatcher.addURI(AUTHORITY, "medicine", MEDICINE_ALL);
         uriMatcher.addURI(AUTHORITY, "medicine/type/#", MEDICINE_TYPE);
-        uriMatcher.addURI(AUTHORITY, "medicine/group/#", MEDICINE_GROUP);
+        uriMatcher.addURI(AUTHORITY, "medicine/group/*", MEDICINE_GROUP);
         uriMatcher.addURI(AUTHORITY, "medicine/#", MEDICINE_SINGLE);
 
         uriMatcher.addURI(AUTHORITY, "medtype", MEDTYPE_ALL);

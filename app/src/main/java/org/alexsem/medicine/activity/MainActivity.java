@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -28,7 +30,11 @@ public class MainActivity extends AppCompatActivity {
 
     private final int REQUEST_EDIT = 293;
 
+    private final int LOADER_MEDICINE = 0;
+    private final int LOADER_GROUP = 1;
+
     private MedicineAdapter mAdapter;
+    private long mSelectedGroupId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +60,9 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(MainActivity.this, EditActivity.class), REQUEST_EDIT);
+                Intent intent = new Intent(MainActivity.this, EditActivity.class);
+                intent.putExtra(EditActivity.EXTRA_GROUP_ID, mSelectedGroupId);
+                startActivityForResult(intent, REQUEST_EDIT);
             }
         });
 
@@ -62,7 +70,12 @@ public class MainActivity extends AppCompatActivity {
         updateIntent.putExtra("noupdate", true);
         startService(updateIntent);
 
-        getSupportLoaderManager().initLoader(0, null, mLoaderCallbacks);
+        if (savedInstanceState != null) {
+            mSelectedGroupId = savedInstanceState.getLong("selectedGroupId");
+        }
+
+        getSupportLoaderManager().initLoader(LOADER_GROUP, null, mGroupLoaderCallbacks);
+        getSupportLoaderManager().initLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
     }
 
     @Override
@@ -94,8 +107,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_EDIT && resultCode == EditActivity.RESULT_GROUP_ADDED) {
-            //TODO handle group editing
+            getSupportLoaderManager().restartLoader(LOADER_GROUP, null, mGroupLoaderCallbacks);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putLong("selectedGroupId", mSelectedGroupId);
+        super.onSaveInstanceState(outState);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -125,12 +144,74 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private ActionBar.TabListener mGroupTabListener = new ActionBar.TabListener() {
+        @Override
+        public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+            mSelectedGroupId = (Long) tab.getTag();
+            getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
+        }
+
+        @Override
+        public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+        }
+
+        @Override
+        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+        }
+    };
+
     //----------------------------------------------------------------------------------------------
 
-    private LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+    private LoaderManager.LoaderCallbacks<Cursor> mGroupLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-            Uri uri = MedicineProvider.Medicine.CONTENT_URI;
+            Uri uri = MedicineProvider.MedicineGroup.CONTENT_URI;
+            String[] projection = {
+                    MedicineProvider.MedicineGroup.ID,
+                    MedicineProvider.Medicine.NAME
+            };
+            return new CursorLoader(MainActivity.this, uri, projection, null, null, null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+            ActionBar actionBar = getSupportActionBar();
+            if (cursor.moveToFirst()) {
+                if (cursor.getCount() == 1) {
+                    long id = cursor.getLong(cursor.getColumnIndex(MedicineProvider.Medicine.ID));
+                    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                    mSelectedGroupId = id;
+                    getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
+                } else {
+                    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+                    actionBar.removeAllTabs();
+                    do {
+                        long id = cursor.getLong(cursor.getColumnIndex(MedicineProvider.Medicine.ID));
+                        ActionBar.Tab tab = actionBar.newTab().setTag(id).setText(cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.NAME))).setTabListener(mGroupTabListener);
+                        actionBar.addTab(tab);
+                        if (id == mSelectedGroupId) {
+                            tab.select();
+                        }
+                    } while (cursor.moveToNext());
+                }
+            } else {
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                mSelectedGroupId = -1;
+                getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+        }
+    };
+
+    private LoaderManager.LoaderCallbacks<Cursor> mMedicineLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+        @Override
+        public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+            Uri uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_GROUP_URI, String.valueOf(mSelectedGroupId));
             String[] projection = {
                     MedicineProvider.Medicine.ID,
                     MedicineProvider.Medicine.NAME,

@@ -34,6 +34,7 @@ import java.util.Date;
 public class EditActivity extends AppCompatActivity {
 
     public static final String EXTRA_MEDICINE_ID = "medicineId";
+    public static final String EXTRA_GROUP_ID = "groupId";
     public static final int RESULT_GROUP_ADDED = RESULT_FIRST_USER + 1;
 
     private Spinner mGroup;
@@ -70,7 +71,7 @@ public class EditActivity extends AppCompatActivity {
         mYear = (Spinner) findViewById(R.id.edit_year);
 
         mGroupAdd.setOnClickListener(mOnGroupAddClickListener);
-        loadGroups(-1);
+        loadGroups(getIntent().getLongExtra(EXTRA_GROUP_ID, -1));
         loadTypes();
         loadExpiration();
 
