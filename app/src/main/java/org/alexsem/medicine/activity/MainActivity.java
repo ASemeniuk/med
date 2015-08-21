@@ -119,8 +119,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_EDIT && resultCode == EditActivity.RESULT_GROUP_ADDED) {
-            getSupportLoaderManager().restartLoader(LOADER_GROUP, null, mGroupLoaderCallbacks);
+        switch (requestCode) {
+            case REQUEST_EDIT:
+                switch (resultCode) {
+                    case EditActivity.RESULT_ITEM_CHANGED:
+                        getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
+                        break;
+                    case EditActivity.RESULT_GROUP_ADDED:
+                        getSupportLoaderManager().restartLoader(LOADER_GROUP, null, mGroupLoaderCallbacks);
+                        break;
+                }
+                break;
         }
     }
 

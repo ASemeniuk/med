@@ -36,6 +36,7 @@ public class EditActivity extends AppCompatActivity {
     public static final String EXTRA_MEDICINE_ID = "medicineId";
     public static final String EXTRA_GROUP_ID = "groupId";
     public static final int RESULT_GROUP_ADDED = RESULT_FIRST_USER + 1;
+    public static final int RESULT_ITEM_CHANGED = RESULT_FIRST_USER + 2;
 
     private Spinner mGroup;
     private Button mGroupAdd;
@@ -198,7 +199,8 @@ public class EditActivity extends AppCompatActivity {
                         getContentResolver().insert(MedicineProvider.Medicine.CONTENT_URI, values);
                     }
                     Toast.makeText(this, R.string.edit_success, Toast.LENGTH_SHORT).show();
-                    onBackPressed();
+                    setResult(RESULT_ITEM_CHANGED);
+                    finish();
                 }
                 return true;
             default:
