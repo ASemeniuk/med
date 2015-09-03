@@ -15,9 +15,7 @@ import android.support.annotation.NonNull;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Provider which is used to access internal database
@@ -61,7 +59,7 @@ public class MedicineProvider extends ContentProvider {
     /**
      * Converts Date object to string representation
      * @param month Month
-     * @param year Year
+     * @param year  Year
      * @return Formatted string
      */
     public static String formatExpireDate(int month, int year) {
@@ -83,6 +81,8 @@ public class MedicineProvider extends ContentProvider {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/medicine");
         public static final Uri CONTENT_GROUP_URI = Uri.parse("content://" + AUTHORITY + "/medicine/group");
+        public static final Uri CONTENT_SEARCH_URI = Uri.parse("content://" + AUTHORITY + "/medicine/search");
+        public static final Uri CONTENT_EMPTY_URI = Uri.parse("content://" + AUTHORITY + "/medicine/empty");
     }
 
     public static final class MedicineType {
@@ -110,7 +110,9 @@ public class MedicineProvider extends ContentProvider {
     private static final int MEDICINE_ALL = 11;
     private static final int MEDICINE_TYPE = 12;
     private static final int MEDICINE_GROUP = 13;
-    private static final int MEDICINE_SINGLE = 14;
+    private static final int MEDICINE_SEARCH = 14;
+    private static final int MEDICINE_EMPTY = 15;
+    private static final int MEDICINE_SINGLE = 16;
     private static final int MEDTYPE_ALL = 21;
     private static final int MEDTYPE_SINGLE = 22;
     private static final int MEDGROUP_ALL = 31;
@@ -124,6 +126,8 @@ public class MedicineProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, "medicine", MEDICINE_ALL);
         uriMatcher.addURI(AUTHORITY, "medicine/type/#", MEDICINE_TYPE);
         uriMatcher.addURI(AUTHORITY, "medicine/group/*", MEDICINE_GROUP);
+        uriMatcher.addURI(AUTHORITY, "medicine/search/*", MEDICINE_SEARCH);
+        uriMatcher.addURI(AUTHORITY, "medicine/empty", MEDICINE_EMPTY);
         uriMatcher.addURI(AUTHORITY, "medicine/#", MEDICINE_SINGLE);
 
         uriMatcher.addURI(AUTHORITY, "medtype", MEDTYPE_ALL);
@@ -147,6 +151,8 @@ public class MedicineProvider extends ContentProvider {
             case MEDICINE_ALL:
             case MEDICINE_TYPE:
             case MEDICINE_GROUP:
+            case MEDICINE_SEARCH:
+            case MEDICINE_EMPTY:
                 return String.format("vnd.android.cursor.dir/vnd.%s.medicine", AUTHORITY);
             case MEDICINE_SINGLE:
                 return String.format("vnd.android.cursor.item/vnd.%s.medicine", AUTHORITY);
@@ -197,6 +203,28 @@ public class MedicineProvider extends ContentProvider {
                 queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
                 selection = (String.format("%s = ?", Medicine.GROUP_ID));
                 selectionArgs = new String[]{uri.getLastPathSegment()};
+                sortOrder = String.format("%s collate nocase", Medicine.NAME);
+                for (int i = 0; i < projection.length; i++) {
+                    if (projection[i].equals(Medicine.ID)) {
+                        projection[i] = String.format("%s.%s", Medicine._T, Medicine.ID);
+                    }
+                }
+                break;
+            case MEDICINE_SEARCH:
+                queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
+                selection = (String.format("%s like ?", Medicine.NAME));
+                selectionArgs = new String[]{String.format("%%%s%%", uri.getLastPathSegment())};
+                sortOrder = String.format("%s collate nocase", Medicine.NAME);
+                for (int i = 0; i < projection.length; i++) {
+                    if (projection[i].equals(Medicine.ID)) {
+                        projection[i] = String.format("%s.%s", Medicine._T, Medicine.ID);
+                    }
+                }
+                break;
+            case MEDICINE_EMPTY:
+                queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
+                selection = "1 = 0";
+                selectionArgs = null;
                 sortOrder = String.format("%s collate nocase", Medicine.NAME);
                 for (int i = 0; i < projection.length; i++) {
                     if (projection[i].equals(Medicine.ID)) {

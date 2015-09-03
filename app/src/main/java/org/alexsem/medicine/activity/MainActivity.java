@@ -8,8 +8,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,8 +37,10 @@ public class MainActivity extends AppCompatActivity {
     private final int LOADER_GROUP = 1;
 
     private Button mGroupRemove;
+    private SearchView mSearchView;
     private MedicineAdapter mAdapter;
     private long mSelectedGroupId = -1;
+    private String mSearchString = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,10 +88,65 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             mSelectedGroupId = savedInstanceState.getLong("selectedGroupId");
+            mSearchString = savedInstanceState.getString("searchString");
         }
 
         getSupportLoaderManager().initLoader(LOADER_GROUP, null, mGroupLoaderCallbacks);
         getSupportLoaderManager().initLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        mSearchView.setIconifiedByDefault(true);
+        mSearchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                mSearchString = "";
+                mSearchView.setQuery(mSearchString, false);
+                getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
+            }
+        });
+        mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                mSearchString = null;
+                getSupportLoaderManager().restartLoader(LOADER_GROUP, null, mGroupLoaderCallbacks);
+                return false;
+            }
+        });
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mSearchString = newText;
+                getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
+                return false;
+            }
+        });
+        mSearchView.setIconified(mSearchString == null);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mSearchView.setQuery("", false);
+                mSearchView.setIconified(true);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -136,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putLong("selectedGroupId", mSelectedGroupId);
+        outState.putString("searchString", mSearchString);
         super.onSaveInstanceState(outState);
     }
 
@@ -202,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             ActionBar actionBar = getSupportActionBar();
             if (cursor.moveToFirst()) {
-                if (cursor.getCount() == 1) {
+                if (cursor.getCount() == 1 || mSearchString != null) {
                     long id = cursor.getLong(cursor.getColumnIndex(MedicineProvider.Medicine.ID));
                     actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                     mSelectedGroupId = id;
@@ -235,7 +295,16 @@ public class MainActivity extends AppCompatActivity {
     private LoaderManager.LoaderCallbacks<Cursor> mMedicineLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-            Uri uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_GROUP_URI, String.valueOf(mSelectedGroupId));
+            Uri uri;
+            if (mSearchString != null) { //Search
+                if (mSearchString.trim().length() > 0) { //Search string available
+                    uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_SEARCH_URI, mSearchString);
+                } else { //Nothing entered yet
+                    uri = MedicineProvider.Medicine.CONTENT_EMPTY_URI;
+                }
+            } else { //Group
+                uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_GROUP_URI, String.valueOf(mSelectedGroupId));
+            }
             String[] projection = {
                     MedicineProvider.Medicine.ID,
                     MedicineProvider.Medicine.NAME,
@@ -252,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             mAdapter.swapCursor(cursor);
-            mGroupRemove.setVisibility(cursor.getCount() <= 0 && getSupportActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS ? View.VISIBLE : View.GONE);
+            mGroupRemove.setVisibility(mSearchString == null && cursor.getCount() <= 0 && getSupportActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS ? View.VISIBLE : View.GONE);
         }
 
         @Override
