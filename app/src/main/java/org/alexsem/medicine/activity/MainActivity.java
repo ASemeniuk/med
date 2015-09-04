@@ -297,11 +297,7 @@ public class MainActivity extends AppCompatActivity {
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
             Uri uri;
             if (mSearchString != null) { //Search
-                if (mSearchString.trim().length() > 0) { //Search string available
-                    uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_SEARCH_URI, mSearchString);
-                } else { //Nothing entered yet
-                    uri = MedicineProvider.Medicine.CONTENT_EMPTY_URI;
-                }
+                uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_SEARCH_URI, mSearchString);
             } else { //Group
                 uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_GROUP_URI, String.valueOf(mSelectedGroupId));
             }
