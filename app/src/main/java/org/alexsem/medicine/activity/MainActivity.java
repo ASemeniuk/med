@@ -31,6 +31,8 @@ import org.alexsem.medicine.transfer.MedicineProvider;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String PARAM_SHOW_OUTDATED = "showOutdated";
+
     private final int REQUEST_EDIT = 293;
 
     private final int LOADER_MEDICINE = 0;
@@ -41,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
     private MedicineAdapter mAdapter;
     private long mSelectedGroupId = -1;
     private String mSearchString = null;
+    private boolean mShowOutdated = false;
+
+    private MenuItem mMenuSearch;
+    private MenuItem mMenuOutdated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +95,11 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             mSelectedGroupId = savedInstanceState.getLong("selectedGroupId");
             mSearchString = savedInstanceState.getString("searchString");
+            mShowOutdated = savedInstanceState.getBoolean("showOutdated");
+        } else { //Regular run
+            if (getIntent().hasExtra(PARAM_SHOW_OUTDATED)) {
+                mShowOutdated = true;
+            }
         }
 
         getSupportLoaderManager().initLoader(LOADER_GROUP, null, mGroupLoaderCallbacks);
@@ -99,13 +110,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        mSearchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        mMenuSearch = menu.findItem(R.id.action_search);
+        mMenuOutdated = menu.findItem(R.id.action_outdated);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(mMenuSearch);
         mSearchView.setIconifiedByDefault(true);
         mSearchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                mShowOutdated = false;
+                mMenuOutdated.setVisible(false);
                 mSearchString = "";
                 mSearchView.setQuery(mSearchString, false);
                 getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
@@ -116,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onClose() {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 mSearchString = null;
+                mMenuOutdated.setVisible(true);
                 getSupportLoaderManager().restartLoader(LOADER_GROUP, null, mGroupLoaderCallbacks);
                 return false;
             }
@@ -133,7 +149,11 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-        mSearchView.setIconified(mSearchString == null);
+        mSearchView.setIconified(mShowOutdated || mSearchString == null);
+        getSupportActionBar().setTitle(mShowOutdated ? R.string.action_outdated : R.string.app_name);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(mShowOutdated || mSearchString != null);
+        mMenuOutdated.setVisible(!mShowOutdated && mSearchString == null);
+        mMenuSearch.setVisible(!mShowOutdated);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -141,8 +161,23 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                getSupportActionBar().setTitle(R.string.app_name);
+                mShowOutdated = false;
                 mSearchView.setQuery("", false);
                 mSearchView.setIconified(true);
+                mMenuOutdated.setVisible(true);
+                mMenuSearch.setVisible(true);
+                return true;
+            case R.id.action_outdated:
+                getSupportActionBar().setTitle(R.string.action_outdated);
+                mShowOutdated = true;
+                mSearchView.setQuery("", false);
+                mSearchView.setIconified(true);
+                mMenuOutdated.setVisible(false);
+                mMenuSearch.setVisible(false);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -196,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putLong("selectedGroupId", mSelectedGroupId);
         outState.putString("searchString", mSearchString);
+        outState.putBoolean("showOutdated", mShowOutdated);
         super.onSaveInstanceState(outState);
     }
 
@@ -262,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             ActionBar actionBar = getSupportActionBar();
             if (cursor.moveToFirst()) {
-                if (cursor.getCount() == 1 || mSearchString != null) {
+                if (cursor.getCount() == 1 || mSearchString != null || mShowOutdated) {
                     long id = cursor.getLong(cursor.getColumnIndex(MedicineProvider.Medicine.ID));
                     actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                     mSelectedGroupId = id;
@@ -296,7 +332,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
             Uri uri;
-            if (mSearchString != null) { //Search
+            if (mShowOutdated) { //Outdated
+                uri = MedicineProvider.Medicine.CONTENT_OUTDATED_URI;
+            } else if (mSearchString != null) { //Search
                 uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_SEARCH_URI, mSearchString);
             } else { //Group
                 uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_GROUP_URI, String.valueOf(mSelectedGroupId));
@@ -317,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             mAdapter.swapCursor(cursor);
-            mGroupRemove.setVisibility(mSearchString == null && cursor.getCount() <= 0 && getSupportActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS ? View.VISIBLE : View.GONE);
+            mGroupRemove.setVisibility(!mShowOutdated && mSearchString == null && cursor.getCount() <= 0 && getSupportActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS ? View.VISIBLE : View.GONE);
         }
 
         @Override

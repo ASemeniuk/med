@@ -157,10 +157,11 @@ public class NotificationService extends Service {
                 for (int i = 0; i < 2; i++) {
                     if (result[i].length() > 0) {
                         Intent intent = new Intent(NotificationService.this, MainActivity.class);
+                        intent.putExtra(MainActivity.PARAM_SHOW_OUTDATED, true);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         PendingIntent contentIntent = PendingIntent.getActivity(NotificationService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                         NotificationCompat.Builder builder = new NotificationCompat.Builder(NotificationService.this)
-                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setSmallIcon(R.drawable.ic_notification)
                                 .setContentTitle(NOTIFICATION_TITLE[i])
                                 .setStyle(new NotificationCompat.BigTextStyle().bigText(result[i]))
                                 .setContentText(result[i])

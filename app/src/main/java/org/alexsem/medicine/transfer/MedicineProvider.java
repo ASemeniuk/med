@@ -82,6 +82,7 @@ public class MedicineProvider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/medicine");
         public static final Uri CONTENT_GROUP_URI = Uri.parse("content://" + AUTHORITY + "/medicine/group");
         public static final Uri CONTENT_SEARCH_URI = Uri.parse("content://" + AUTHORITY + "/medicine/search");
+        public static final Uri CONTENT_OUTDATED_URI = Uri.parse("content://" + AUTHORITY + "/medicine/outdated");
     }
 
     public static final class MedicineType {
@@ -110,7 +111,8 @@ public class MedicineProvider extends ContentProvider {
     private static final int MEDICINE_TYPE = 12;
     private static final int MEDICINE_GROUP = 13;
     private static final int MEDICINE_SEARCH = 14;
-    private static final int MEDICINE_SINGLE = 15;
+    private static final int MEDICINE_OUTDATED = 15;
+    private static final int MEDICINE_SINGLE = 16;
     private static final int MEDTYPE_ALL = 21;
     private static final int MEDTYPE_SINGLE = 22;
     private static final int MEDGROUP_ALL = 31;
@@ -126,6 +128,7 @@ public class MedicineProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, "medicine/group/*", MEDICINE_GROUP);
         uriMatcher.addURI(AUTHORITY, "medicine/search/*", MEDICINE_SEARCH);
         uriMatcher.addURI(AUTHORITY, "medicine/search/", MEDICINE_SEARCH);
+        uriMatcher.addURI(AUTHORITY, "medicine/outdated", MEDICINE_OUTDATED);
         uriMatcher.addURI(AUTHORITY, "medicine/#", MEDICINE_SINGLE);
 
         uriMatcher.addURI(AUTHORITY, "medtype", MEDTYPE_ALL);
@@ -150,6 +153,7 @@ public class MedicineProvider extends ContentProvider {
             case MEDICINE_TYPE:
             case MEDICINE_GROUP:
             case MEDICINE_SEARCH:
+            case MEDICINE_OUTDATED:
                 return String.format("vnd.android.cursor.dir/vnd.%s.medicine", AUTHORITY);
             case MEDICINE_SINGLE:
                 return String.format("vnd.android.cursor.item/vnd.%s.medicine", AUTHORITY);
@@ -212,6 +216,17 @@ public class MedicineProvider extends ContentProvider {
                 selection = (String.format("%s like ?", Medicine.NAME));
                 selectionArgs = new String[]{String.format("%%%s%%", uri.toString().substring(uri.toString().lastIndexOf("/") + 1))};
                 sortOrder = String.format("%s collate nocase", Medicine.NAME);
+                for (int i = 0; i < projection.length; i++) {
+                    if (projection[i].equals(Medicine.ID)) {
+                        projection[i] = String.format("%s.%s", Medicine._T, Medicine.ID);
+                    }
+                }
+                break;
+            case MEDICINE_OUTDATED:
+                queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
+                selection = (String.format("%s <= '%s'", Medicine.EXPIRATION, MedicineProvider.formatExpireDate(new Date())));
+                selectionArgs = null;
+                sortOrder = String.format("%s, %s collate nocase", Medicine.EXPIRATION, Medicine.NAME);
                 for (int i = 0; i < projection.length; i++) {
                     if (projection[i].equals(Medicine.ID)) {
                         projection[i] = String.format("%s.%s", Medicine._T, Medicine.ID);

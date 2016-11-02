@@ -4,6 +4,7 @@
     <string name="action_done">Готово</string>
     <string name="action_delete">Удалить</string>
     <string name="action_search">Поиск</string>
+    <string name="action_outdated">Просроченные</string>
 
     <string name="medicine_empty">Отсутствуют данные для отображения</string>
 
