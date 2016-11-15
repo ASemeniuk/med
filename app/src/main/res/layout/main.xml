@@ -1,46 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <com.baoyz.swipemenulistview.SwipeMenuListView
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <Button
-        style="@style/Widget.AppCompat.Button"
-        android:id="@+id/main_group_remove"
-        android:minHeight="1dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_accent"
-        android:text="@string/group_remove"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"
-        android:textColor="@android:color/white"
-        android:visibility="gone"/>
-
-    <TextView
-        android:id="@android:id/empty"
+    <!-- The main content view -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:hint="@string/medicine_empty"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:background="@color/background"
+        android:orientation="vertical">
 
-    <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/main_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_add"
-        fab:fab_colorNormal="@color/accent"
-        fab:fab_colorPressed="@color/accent_dark"
-        fab:fab_colorRipple="@color/ripple"/>
+        <com.baoyz.swipemenulistview.SwipeMenuListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
-</FrameLayout>
+        <Button
+            style="@style/Widget.AppCompat.Button"
+            android:id="@+id/main_group_remove"
+            android:minHeight="1dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_accent"
+            android:text="@string/group_remove"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:textColor="@android:color/white"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:hint="@string/medicine_empty"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/main_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add"
+            fab:fab_colorNormal="@color/accent"
+            fab:fab_colorPressed="@color/accent_dark"
+            fab:fab_colorRipple="@color/ripple"/>
+
+    </FrameLayout>
+
+    <!-- The navigation drawer -->
+
+    <ListView android:id="@+id/main_drawer_list"
+              android:layout_width="240dp"
+              android:layout_height="match_parent"
+              android:layout_gravity="start"
+              android:choiceMode="singleChoice"
+              android:background="@color/background"
+              android:divider="@android:color/transparent"
+              android:dividerHeight="0dp"/>
+</android.support.v4.widget.DrawerLayout>

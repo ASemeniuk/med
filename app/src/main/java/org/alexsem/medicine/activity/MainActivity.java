@@ -1,6 +1,7 @@
 package org.alexsem.medicine.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,7 +10,9 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
@@ -18,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
@@ -38,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
     private final int LOADER_MEDICINE = 0;
     private final int LOADER_GROUP = 1;
 
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+
     private Button mGroupRemove;
     private SearchView mSearchView;
     private MedicineAdapter mAdapter;
@@ -52,6 +60,56 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.main_drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.main_drawer_list);
+
+//!!!        mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mPlanetTitles));
+//!!!        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0) {
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                super.onDrawerStateChanged(newState);
+                if (newState == DrawerLayout.STATE_SETTLING) {
+                    if (!mDrawerLayout.isDrawerOpen(mDrawerList)) {
+                        if (mMenuSearch != null) {
+                            mMenuSearch.setVisible(false);
+                        }
+                        if (mMenuOutdated != null) {
+                            mMenuOutdated.setVisible(false);
+                        }
+                    }
+
+                }
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                if (mMenuSearch != null) {
+                    mMenuSearch.setVisible(false);
+                }
+                if (mMenuOutdated != null) {
+                    mMenuOutdated.setVisible(false);
+                }
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                if (mMenuSearch != null) {
+                    mMenuSearch.setVisible(!mShowOutdated);
+                }
+                if (mMenuOutdated != null) {
+                    mMenuOutdated.setVisible(!mShowOutdated && mSearchString == null); //todo asdf
+                }
+
+            }
+        };
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mAdapter = new MedicineAdapter(this, null);
         SwipeMenuListView list = (SwipeMenuListView) findViewById(android.R.id.list);
@@ -106,6 +164,18 @@ public class MainActivity extends AppCompatActivity {
         getSupportLoaderManager().initLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -117,7 +187,10 @@ public class MainActivity extends AppCompatActivity {
         mSearchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                mDrawerToggle.setDrawerIndicatorEnabled(false);
+                if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                }
                 getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 mShowOutdated = false;
                 mMenuOutdated.setVisible(false);
@@ -129,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                mDrawerToggle.setDrawerIndicatorEnabled(true);
                 mSearchString = null;
                 mMenuOutdated.setVisible(true);
                 getSupportLoaderManager().restartLoader(LOADER_GROUP, null, mGroupLoaderCallbacks);
@@ -151,17 +224,25 @@ public class MainActivity extends AppCompatActivity {
         });
         mSearchView.setIconified(mShowOutdated || mSearchString == null);
         getSupportActionBar().setTitle(mShowOutdated ? R.string.action_outdated : R.string.app_name);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(mShowOutdated || mSearchString != null);
-        mMenuOutdated.setVisible(!mShowOutdated && mSearchString == null);
-        mMenuSearch.setVisible(!mShowOutdated);
+        mDrawerToggle.setDrawerIndicatorEnabled(!mShowOutdated && mSearchString == null);
+        if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
+            mMenuOutdated.setVisible(false);
+            mMenuSearch.setVisible(false);
+        } else {
+            mMenuOutdated.setVisible(!mShowOutdated && mSearchString == null);
+            mMenuSearch.setVisible(!mShowOutdated);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         switch (item.getItemId()) {
             case android.R.id.home:
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                mDrawerToggle.setDrawerIndicatorEnabled(true);
                 getSupportActionBar().setTitle(R.string.app_name);
                 mShowOutdated = false;
                 mSearchView.setQuery("", false);
@@ -171,12 +252,15 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_outdated:
                 getSupportActionBar().setTitle(R.string.action_outdated);
+                if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                }
                 mShowOutdated = true;
                 mSearchView.setQuery("", false);
                 mSearchView.setIconified(true);
                 mMenuOutdated.setVisible(false);
                 mMenuSearch.setVisible(false);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                mDrawerToggle.setDrawerIndicatorEnabled(false);
                 getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 return true;
             default:
