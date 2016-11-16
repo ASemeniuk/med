@@ -3,12 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/row_medicine"
     android:orientation="horizontal"
     android:paddingBottom="16dp"
     android:paddingLeft="12dp"
     android:paddingRight="12dp"
-    android:paddingTop="16dp"
-    android:background="@drawable/row_medicine">
+    android:paddingTop="16dp">
 
     <TextView
         android:id="@+id/medicine_expiration"
@@ -19,7 +19,8 @@
         android:gravity="right"
         android:lines="1"
         android:minEms="4"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        android:textColor="@color/text"
+        android:textSize="16sp"/>
 
     <TextView
         android:id="@+id/medicine_unit"
@@ -29,7 +30,8 @@
         android:layout_marginLeft="4dp"
         android:layout_toLeftOf="@id/medicine_expiration"
         android:lines="1"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:textColor="@color/text"
+        android:textSize="13sp"/>
 
     <TextView
         android:id="@+id/medicine_amount"
@@ -38,7 +40,8 @@
         android:layout_marginLeft="8dp"
         android:layout_toLeftOf="@id/medicine_unit"
         android:lines="1"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        android:textColor="@color/text"
+        android:textSize="16sp"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -55,7 +58,8 @@
             android:ellipsize="end"
             android:lines="1"
             android:maxLines="1"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:textColor="@color/text"
+            android:textSize="16sp"/>
 
         <TextView
             android:id="@+id/medicine_type"
@@ -65,7 +69,8 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:lines="1"
-            android:textAppearance="?android:attr/textAppearanceSmall"/>
+            android:textColor="@color/text"
+            android:textSize="13sp"/>
     </LinearLayout>
 
 

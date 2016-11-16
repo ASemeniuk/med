@@ -10,4 +10,5 @@
 
     <color name="ripple">#727272</color>
     <color name="background">#fefefe</color>
+    <color name="text">#000000</color>
 </resources>

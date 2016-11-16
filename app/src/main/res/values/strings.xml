@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Medicine</string>
 
+    <string name="drawer_export">Экспорт</string>
+    <string name="drawer_import">Импорт</string>
+
     <string name="action_done">Готово</string>
     <string name="action_delete">Удалить</string>
     <string name="action_search">Поиск</string>

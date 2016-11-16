@@ -1,10 +1,12 @@
 package org.alexsem.medicine.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -29,6 +31,7 @@ import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 
 import org.alexsem.medicine.R;
+import org.alexsem.medicine.adapter.DrawerAdapter;
 import org.alexsem.medicine.adapter.MedicineAdapter;
 import org.alexsem.medicine.notification.NotificationService;
 import org.alexsem.medicine.transfer.MedicineProvider;
@@ -64,49 +67,13 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.main_drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.main_drawer_list);
 
-//!!!        mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mPlanetTitles));
-//!!!        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0) {
-
-            @Override
-            public void onDrawerStateChanged(int newState) {
-                super.onDrawerStateChanged(newState);
-                if (newState == DrawerLayout.STATE_SETTLING) {
-                    if (!mDrawerLayout.isDrawerOpen(mDrawerList)) {
-                        if (mMenuSearch != null) {
-                            mMenuSearch.setVisible(false);
-                        }
-                        if (mMenuOutdated != null) {
-                            mMenuOutdated.setVisible(false);
-                        }
-                    }
-
-                }
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                if (mMenuSearch != null) {
-                    mMenuSearch.setVisible(false);
-                }
-                if (mMenuOutdated != null) {
-                    mMenuOutdated.setVisible(false);
-                }
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                if (mMenuSearch != null) {
-                    mMenuSearch.setVisible(!mShowOutdated);
-                }
-                if (mMenuOutdated != null) {
-                    mMenuOutdated.setVisible(!mShowOutdated && mSearchString == null); //todo asdf
-                }
-
-            }
+        int[][] drawerData = {
+                {R.drawable.ic_drawer_export, R.string.drawer_export},
+                {R.drawable.ic_drawer_import, R.string.drawer_import}
         };
+        mDrawerList.setAdapter(new DrawerAdapter(this, drawerData));
+       mDrawerList.setOnItemClickListener(mOnDrawerListItemClickListener);
+        mDrawerToggle = new MainDrawerToggle();
         mDrawerToggle.setDrawerIndicatorEnabled(true);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -364,6 +331,66 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    //----------------------------------------------------------------------------------------------
+
+    class MainDrawerToggle extends ActionBarDrawerToggle {
+
+        public MainDrawerToggle() {
+            super(MainActivity.this, mDrawerLayout, 0, 0);
+        }
+
+        @Override
+        public void onDrawerStateChanged(int newState) {
+            super.onDrawerStateChanged(newState);
+            if (newState == DrawerLayout.STATE_SETTLING) {
+                if (!mDrawerLayout.isDrawerOpen(mDrawerList)) {
+                    if (mMenuSearch != null) {
+                        mMenuSearch.setVisible(false);
+                    }
+                    if (mMenuOutdated != null) {
+                        mMenuOutdated.setVisible(false);
+                    }
+                }
+
+            }
+        }
+
+        @Override
+        public void onDrawerOpened(View drawerView) {
+            super.onDrawerOpened(drawerView);
+            if (mMenuSearch != null) {
+                mMenuSearch.setVisible(false);
+            }
+            if (mMenuOutdated != null) {
+                mMenuOutdated.setVisible(false);
+            }
+        }
+
+        @Override
+        public void onDrawerClosed(View drawerView) {
+            super.onDrawerClosed(drawerView);
+            if (mMenuSearch != null) {
+                mMenuSearch.setVisible(!mShowOutdated);
+            }
+            if (mMenuOutdated != null) {
+                mMenuOutdated.setVisible(!mShowOutdated && mSearchString == null);
+            }
+
+        }
+    }
+
+    private AdapterView.OnItemClickListener mOnDrawerListItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+            switch (position) {
+                case 0:
+                    break;
+            }
+            mDrawerLayout.closeDrawer(mDrawerList);
+        }
+    };
+
 
     //----------------------------------------------------------------------------------------------
 
