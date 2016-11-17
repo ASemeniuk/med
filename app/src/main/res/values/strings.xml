@@ -31,6 +31,10 @@
     <string name="dialog_add">Добавить</string>
     <string name="dialog_cancel">Отмена</string>
 
+    <string name="share_using">Отправить</string>
+    <string name="error_export">Не удалось экспортировать данные</string>
+
+
     <string-array name="edit_months">
         <item>январь</item>
         <item>февраль</item>

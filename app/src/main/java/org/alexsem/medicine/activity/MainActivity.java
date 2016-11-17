@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
@@ -34,7 +35,11 @@ import org.alexsem.medicine.R;
 import org.alexsem.medicine.adapter.DrawerAdapter;
 import org.alexsem.medicine.adapter.MedicineAdapter;
 import org.alexsem.medicine.notification.NotificationService;
+import org.alexsem.medicine.transfer.ImportExportManager;
 import org.alexsem.medicine.transfer.MedicineProvider;
+import org.json.JSONException;
+
+import java.text.ParseException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -72,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 {R.drawable.ic_drawer_import, R.string.drawer_import}
         };
         mDrawerList.setAdapter(new DrawerAdapter(this, drawerData));
-       mDrawerList.setOnItemClickListener(mOnDrawerListItemClickListener);
+        mDrawerList.setOnItemClickListener(mOnDrawerListItemClickListener);
         mDrawerToggle = new MainDrawerToggle();
         mDrawerToggle.setDrawerIndicatorEnabled(true);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -384,7 +389,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
             switch (position) {
-                case 0:
+                case 0: //Export data
+                    try {
+                        String data = ImportExportManager.export(MainActivity.this);
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, data);
+                        sendIntent.setType("text/plain");
+                        startActivity(Intent.createChooser(sendIntent, getString(R.string.share_using)));
+                    } catch (JSONException | ParseException exception) {
+                        Toast.makeText(MainActivity.this, R.string.error_export, Toast.LENGTH_LONG).show();
+                    }
+                    break;
+                case 1: //Import data
+                    //!!! Implement import
                     break;
             }
             mDrawerLayout.closeDrawer(mDrawerList);
