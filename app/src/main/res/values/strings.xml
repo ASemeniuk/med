@@ -29,10 +29,16 @@
     <string name="notification_expired">Просрочены!:\n</string>
 
     <string name="dialog_add">Добавить</string>
+    <string name="dialog_proceed">Продолжить</string>
     <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_ok">ОК</string>
 
     <string name="share_using">Отправить</string>
-    <string name="error_export">Не удалось экспортировать данные</string>
+    <string name="export_error">Не удалось экспортировать данные</string>
+    <string name="import_warning_title">Внимание</string>
+    <string name="import_warning_message">Все текущие данные будут перезаписаны. Продолжить импорт?</string>
+    <string name="import_success">Данные успешно импортированы</string>
+    <string name="import_error">Не удалось импортировать данные</string>
 
 
     <string-array name="edit_months">

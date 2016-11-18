@@ -3,8 +3,8 @@
 
     <application
         android:allowBackup="true"
-        android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
         <activity
@@ -25,13 +25,22 @@
             android:exported="false"/>
 
         <service
+            android:name=".transfer.ImportService"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:enabled="true"/>
+
+        <service
             android:name=".notification.NotificationService"
-            android:enabled="true" />
+            android:enabled="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"/>
+
         <receiver
             android:name=".notification.AlarmReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="org.alexsem.medicine.ACTION_ALARM" />
+                <action android:name="org.alexsem.medicine.ACTION_ALARM"/>
             </intent-filter>
         </receiver>
 

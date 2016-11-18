@@ -56,9 +56,8 @@ public class MedicineGroup implements Comparable<MedicineGroup> {
      * @param json JSONObject to parse
      * @return parsed object
      * @throws JSONException   in case parsing failed
-     * @throws ParseException in case date parsing failed
      */
-    public static MedicineGroup fromJSON(JSONObject json) throws JSONException, ParseException {
+    public static MedicineGroup fromJSON(JSONObject json) throws JSONException {
         MedicineGroup group = new MedicineGroup();
         group.setId(json.getLong("id"));
         group.setName(json.getString("name"));

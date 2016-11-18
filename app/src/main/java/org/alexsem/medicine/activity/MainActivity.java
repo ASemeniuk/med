@@ -1,12 +1,12 @@
 package org.alexsem.medicine.activity;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -15,6 +15,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
@@ -36,6 +37,7 @@ import org.alexsem.medicine.adapter.DrawerAdapter;
 import org.alexsem.medicine.adapter.MedicineAdapter;
 import org.alexsem.medicine.notification.NotificationService;
 import org.alexsem.medicine.transfer.ImportExportManager;
+import org.alexsem.medicine.transfer.ImportService;
 import org.alexsem.medicine.transfer.MedicineProvider;
 import org.json.JSONException;
 
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String PARAM_SHOW_OUTDATED = "showOutdated";
 
     private final int REQUEST_EDIT = 293;
+    private final int REQUEST_IMPORT = 123;
 
     private final int LOADER_MEDICINE = 0;
     private final int LOADER_GROUP = 1;
@@ -267,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_EDIT:
@@ -278,6 +281,21 @@ public class MainActivity extends AppCompatActivity {
                     case EditActivity.RESULT_GROUP_ADDED:
                         getSupportLoaderManager().restartLoader(LOADER_GROUP, null, mGroupLoaderCallbacks);
                         break;
+                }
+                break;
+            case REQUEST_IMPORT:
+                if (resultCode == Activity.RESULT_OK) {
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.import_warning_title)
+                            .setMessage(R.string.import_warning_message)
+                            .setPositiveButton(R.string.dialog_proceed, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    startService(new Intent(MainActivity.this, ImportService.class).setData(data.getData()));
+                                }
+                            })
+                            .setNegativeButton(R.string.dialog_cancel, null)
+                            .show();
                 }
                 break;
         }
@@ -391,18 +409,21 @@ public class MainActivity extends AppCompatActivity {
             switch (position) {
                 case 0: //Export data
                     try {
-                        String data = ImportExportManager.export(MainActivity.this);
+                        String data = ImportExportManager.exportData(MainActivity.this);
+//                        System.out.println(data); //!!!remove
                         Intent sendIntent = new Intent();
                         sendIntent.setAction(Intent.ACTION_SEND);
                         sendIntent.putExtra(Intent.EXTRA_TEXT, data);
                         sendIntent.setType("text/plain");
                         startActivity(Intent.createChooser(sendIntent, getString(R.string.share_using)));
                     } catch (JSONException | ParseException exception) {
-                        Toast.makeText(MainActivity.this, R.string.error_export, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, R.string.export_error, Toast.LENGTH_LONG).show();
                     }
                     break;
                 case 1: //Import data
-                    //!!! Implement import
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("text/*");
+                    startActivityForResult(intent, REQUEST_IMPORT);
                     break;
             }
             mDrawerLayout.closeDrawer(mDrawerList);

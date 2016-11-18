@@ -1,8 +1,12 @@
 package org.alexsem.medicine.transfer;
 
+import android.content.ContentProviderOperation;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.RemoteException;
 
 import org.alexsem.medicine.model.Medicine;
 import org.alexsem.medicine.model.MedicineGroup;
@@ -12,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 
 /**
  * Contains methods to retrieve and deploy DB data in JSON format
@@ -25,7 +30,7 @@ public abstract class ImportExportManager {
      * @throws JSONException in case JSON parsing fails
      * @throws ParseException in case date parsing fails
      */
-    public static String export(Context context) throws JSONException, ParseException {
+    public static String exportData(Context context) throws JSONException, ParseException {
         JSONObject jData = new JSONObject();
 
         //---- Load Medicine Type data ----
@@ -117,6 +122,59 @@ public abstract class ImportExportManager {
         jData.put("medicine", jMedicine);
 
         return jData.toString(2);
+    }
+
+
+    /**
+     * Import medicine data to database
+     * Warning: Existing database content will be erased
+     * @param context Context
+     * @param data JSON data to import
+     */
+    public static void importData(Context context, String data) throws RemoteException, OperationApplicationException, JSONException, ParseException {
+        JSONObject jData = new JSONObject(data);
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+
+        operations.add(ContentProviderOperation.newDelete(MedicineProvider.MedicineType.CONTENT_URI).build());
+        operations.add(ContentProviderOperation.newDelete(MedicineProvider.MedicineGroup.CONTENT_URI).build());
+        operations.add(ContentProviderOperation.newDelete(MedicineProvider.Medicine.CONTENT_URI).build());
+
+        JSONArray jTypes = jData.getJSONArray("types");
+        ContentValues values1 = new ContentValues();
+        for (int i = 0; i < jTypes.length(); i++) {
+            MedicineType type = MedicineType.fromJSON(jTypes.getJSONObject(i));
+            values1.put(MedicineProvider.MedicineType.ID, type.getId());
+            values1.put(MedicineProvider.MedicineType.TYPE, type.getType());
+            values1.put(MedicineProvider.MedicineType.UNIT, type.getUnit());
+            values1.put(MedicineProvider.MedicineType.MEASURABLE, type.isMeasurable() ? 1 : 0);
+            operations.add(ContentProviderOperation.newInsert(MedicineProvider.MedicineType.CONTENT_URI).withValues(values1).build());
+        }
+
+        JSONArray jGroups = jData.getJSONArray("groups");
+        ContentValues values2 = new ContentValues();
+        for (int i = 0; i < jGroups.length(); i++) {
+            MedicineGroup group = MedicineGroup.fromJSON(jGroups.getJSONObject(i));
+            values2.put(MedicineProvider.MedicineGroup.ID, group.getId());
+            values2.put(MedicineProvider.MedicineGroup.NAME, group.getName());
+            operations.add(ContentProviderOperation.newInsert(MedicineProvider.MedicineGroup.CONTENT_URI).withValues(values2).build());
+        }
+
+        JSONArray jMedicine = jData.getJSONArray("medicine");
+        ContentValues values3 = new ContentValues();
+        for (int i = 0; i < jMedicine.length(); i++) {
+            Medicine medicine = Medicine.fromJSON(jMedicine.getJSONObject(i));
+            values3.put(MedicineProvider.Medicine.ID, medicine.getId());
+            values3.put(MedicineProvider.Medicine.GROUP_ID, medicine.getGroupId());
+            values3.put(MedicineProvider.Medicine.NAME, medicine.getName());
+            values3.put(MedicineProvider.Medicine.DESCRIPTION, medicine.getDescription());
+            values3.put(MedicineProvider.Medicine.LINK, medicine.getLink());
+            values3.put(MedicineProvider.Medicine.TYPE_ID, medicine.getTypeId());
+            values3.put(MedicineProvider.Medicine.AMOUNT, medicine.getAmount());
+            values3.put(MedicineProvider.Medicine.EXPIRATION, MedicineProvider.formatExpireDate(medicine.getExpireAt()));
+            operations.add(ContentProviderOperation.newInsert(MedicineProvider.Medicine.CONTENT_URI).withValues(values3).build());
+        }
+
+        context.getContentResolver().applyBatch(MedicineProvider.AUTHORITY, operations);
     }
 
 }
