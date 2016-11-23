@@ -410,7 +410,6 @@ public class MainActivity extends AppCompatActivity {
                 case 0: //Export data
                     try {
                         String data = ImportExportManager.exportData(MainActivity.this);
-//                        System.out.println(data); //!!!remove
                         Intent sendIntent = new Intent();
                         sendIntent.setAction(Intent.ACTION_SEND);
                         sendIntent.putExtra(Intent.EXTRA_TEXT, data);

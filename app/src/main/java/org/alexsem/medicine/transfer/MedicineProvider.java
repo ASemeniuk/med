@@ -182,7 +182,7 @@ public class MedicineProvider extends ContentProvider {
                 queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
                 selection = null;
                 selectionArgs = null;
-                sortOrder = String.format("%s collate nocase", Medicine.NAME);
+                sortOrder = String.format("%s collate nocase, %s", Medicine.NAME, Medicine.EXPIRATION);
                 for (int i = 0; i < projection.length; i++) {
                     if (projection[i].equals(Medicine.ID)) {
                         projection[i] = String.format("%s.%s", Medicine._T, Medicine.ID);
@@ -193,7 +193,7 @@ public class MedicineProvider extends ContentProvider {
                 queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
                 selection = (String.format("%s = ?", Medicine.TYPE_ID));
                 selectionArgs = new String[]{uri.getLastPathSegment()};
-                sortOrder = String.format("%s collate nocase", Medicine.NAME);
+                sortOrder = String.format("%s collate nocase, %s", Medicine.NAME, Medicine.EXPIRATION);
                 for (int i = 0; i < projection.length; i++) {
                     if (projection[i].equals(Medicine.ID)) {
                         projection[i] = String.format("%s.%s", Medicine._T, Medicine.ID);
@@ -204,7 +204,7 @@ public class MedicineProvider extends ContentProvider {
                 queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
                 selection = (String.format("%s = ?", Medicine.GROUP_ID));
                 selectionArgs = new String[]{uri.getLastPathSegment()};
-                sortOrder = String.format("%s collate nocase", Medicine.NAME);
+                sortOrder = String.format("%s collate nocase, %s", Medicine.NAME, Medicine.EXPIRATION);
                 for (int i = 0; i < projection.length; i++) {
                     if (projection[i].equals(Medicine.ID)) {
                         projection[i] = String.format("%s.%s", Medicine._T, Medicine.ID);
@@ -215,7 +215,7 @@ public class MedicineProvider extends ContentProvider {
                 queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
                 selection = (String.format("%s like ?", Medicine.NAME));
                 selectionArgs = new String[]{String.format("%%%s%%", uri.toString().substring(uri.toString().lastIndexOf("/") + 1))};
-                sortOrder = String.format("%s collate nocase", Medicine.NAME);
+                sortOrder = String.format("%s collate nocase, %s", Medicine.NAME, Medicine.EXPIRATION);
                 for (int i = 0; i < projection.length; i++) {
                     if (projection[i].equals(Medicine.ID)) {
                         projection[i] = String.format("%s.%s", Medicine._T, Medicine.ID);
