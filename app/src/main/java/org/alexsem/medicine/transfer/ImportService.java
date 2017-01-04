@@ -44,6 +44,7 @@ public class ImportService extends IntentService {
             }
             mHandler.post(successRunnable);
         } catch (Exception ex) {
+            ex.printStackTrace();
             mHandler.post(errorRunnable);
         }
     }
