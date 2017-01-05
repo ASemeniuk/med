@@ -123,10 +123,10 @@ public class Medicine implements Comparable<Medicine> {
         medicine.setId(json.getLong("id"));
         medicine.setGroupId(json.getLong("groupId"));
         medicine.setName(json.getString("name"));
-        medicine.setDescription(json.getString("description"));
-        medicine.setDescription(json.getString("link"));
+        medicine.setDescription(json.optString("description", ""));
+        medicine.setDescription(json.optString("link", ""));
         medicine.setTypeId(json.getLong("typeId"));
-        medicine.setAmount(json.getInt("amount"));
+        medicine.setAmount(json.optInt("amount", 0));
         medicine.setExpireAt(MedicineProvider.parseExpireDate(json.getString("expireAt")));
         return medicine;
     }
