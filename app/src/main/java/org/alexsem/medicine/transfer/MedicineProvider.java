@@ -213,7 +213,7 @@ public class MedicineProvider extends ContentProvider {
                 break;
             case MEDICINE_SEARCH:
                 queryBuilder.setTables(String.format("%1$s inner join %2$s on %1$s.%3$s = %2$s.%4$s", Medicine._T, MedicineType._T, Medicine.TYPE_ID, MedicineType.ID));
-                selection = (String.format("%s like ?", Medicine.NAME));
+                selection = (String.format("%s like ? collate nocase", Medicine.NAME));
                 selectionArgs = new String[]{String.format("%%%s%%", uri.toString().substring(uri.toString().lastIndexOf("/") + 1))};
                 sortOrder = String.format("%s collate nocase, %s", Medicine.NAME, Medicine.EXPIRATION);
                 for (int i = 0; i < projection.length; i++) {
