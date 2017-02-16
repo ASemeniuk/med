@@ -35,6 +35,7 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import org.alexsem.medicine.R;
 import org.alexsem.medicine.adapter.DrawerAdapter;
 import org.alexsem.medicine.adapter.MedicineAdapter;
+import org.alexsem.medicine.model.Medicine;
 import org.alexsem.medicine.notification.NotificationService;
 import org.alexsem.medicine.transfer.ImportExportManager;
 import org.alexsem.medicine.transfer.ImportService;
@@ -42,6 +43,7 @@ import org.alexsem.medicine.transfer.MedicineProvider;
 import org.json.JSONException;
 
 import java.text.ParseException;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -247,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         switch (v.getId()) {
             case android.R.id.list:
+                menu.add(Menu.NONE, 0, 0, R.string.action_copy);
                 menu.add(Menu.NONE, 0, 0, R.string.action_delete);
                 break;
             default:
@@ -258,11 +261,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case 0: //Delete
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                Uri uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_URI, String.valueOf(info.id));
-                getContentResolver().delete(uri, null, null);
-                getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
+            case 0: //Copy
+                int position = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
+                copyMedicine((Cursor) mAdapter.getItem(position));
+                return true;
+            case 1: //Delete
+                deleteMedicine(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id);
                 return true;
             default:
                 return super.onContextItemSelected(item);
@@ -309,12 +313,50 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
+
+    /**
+     * Copy specific medicine item
+     * @param cursor Cursor pointing to the item to copy
+     */
+    private void copyMedicine(Cursor cursor) {
+        Medicine medicine = new Medicine();
+        medicine.setGroupId(cursor.getInt(cursor.getColumnIndex(MedicineProvider.Medicine.GROUP_ID)));
+        medicine.setName(cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.NAME)));
+        medicine.setDescription(cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.DESCRIPTION)));
+        medicine.setLink(cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.LINK)));
+        medicine.setAmount(cursor.getInt(cursor.getColumnIndex(MedicineProvider.Medicine.AMOUNT)));
+        medicine.setTypeId(cursor.getLong(cursor.getColumnIndex(MedicineProvider.Medicine.TYPE_ID)));
+        try {
+            medicine.setExpireAt(MedicineProvider.parseExpireDate(cursor.getString(cursor.getColumnIndex(MedicineProvider.Medicine.EXPIRATION))));
+        } catch (ParseException e) {
+            medicine.setExpireAt(new Date());
+        }
+        Intent intent = new Intent(this, EditActivity.class);
+        intent.putExtra(EditActivity.EXTRA_MEDICINE, medicine);
+        startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    /**
+     * Remove specific medicine item
+     * @param id Medicine identifier
+     */
+    private void deleteMedicine(long id) {
+        Uri uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_URI, String.valueOf(id));
+        getContentResolver().delete(uri, null, null);
+        getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
+    }
+
     //----------------------------------------------------------------------------------------------
 
     private SwipeMenuCreator mSwipeMenuCreator = new SwipeMenuCreator() {
 
         @Override
         public void create(SwipeMenu menu) {
+            SwipeMenuItem copyItem = new SwipeMenuItem(MainActivity.this);
+            copyItem.setBackground(getResources().getDrawable(R.drawable.selector_primary));
+            copyItem.setWidth(getResources().getDimensionPixelSize(R.dimen.list_action_width));
+            copyItem.setIcon(R.drawable.ic_copy);
+            menu.addMenuItem(copyItem);
             SwipeMenuItem deleteItem = new SwipeMenuItem(MainActivity.this);
             deleteItem.setBackground(getResources().getDrawable(R.drawable.selector_accent));
             deleteItem.setWidth(getResources().getDimensionPixelSize(R.dimen.list_action_width));
@@ -327,10 +369,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
             switch (index) {
-                case 0: //Delete
-                    Uri uri = Uri.withAppendedPath(MedicineProvider.Medicine.CONTENT_URI, String.valueOf(mAdapter.getItemId(position)));
-                    getContentResolver().delete(uri, null, null);
-                    getSupportLoaderManager().restartLoader(LOADER_MEDICINE, null, mMedicineLoaderCallbacks);
+                case 0: //Copy
+                    copyMedicine((Cursor) mAdapter.getItem(position));
+                    break;
+                case 1: //Delete
+                    deleteMedicine(mAdapter.getItemId(position));
                     break;
             }
             return false;
@@ -490,10 +533,13 @@ public class MainActivity extends AppCompatActivity {
             }
             String[] projection = {
                     MedicineProvider.Medicine.ID,
+                    MedicineProvider.Medicine.GROUP_ID,
                     MedicineProvider.Medicine.NAME,
                     MedicineProvider.Medicine.DESCRIPTION,
+                    MedicineProvider.Medicine.LINK,
                     MedicineProvider.Medicine.AMOUNT,
                     MedicineProvider.Medicine.EXPIRATION,
+                    MedicineProvider.Medicine.TYPE_ID,
                     MedicineProvider.MedicineType.TYPE,
                     MedicineProvider.MedicineType.UNIT,
                     MedicineProvider.MedicineType.MEASURABLE

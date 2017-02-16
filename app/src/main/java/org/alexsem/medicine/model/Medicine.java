@@ -1,5 +1,7 @@
 package org.alexsem.medicine.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import org.alexsem.medicine.transfer.MedicineProvider;
@@ -13,7 +15,7 @@ import java.util.Date;
  * Class which contains data for one specific medicine item
  * @author Semeniuk A.D.
  */
-public class Medicine implements Comparable<Medicine> {
+public class Medicine implements Comparable<Medicine>, Parcelable {
 
     private long id;
     private long groupId;
@@ -88,9 +90,49 @@ public class Medicine implements Comparable<Medicine> {
         this.expireAt = expireAt;
     }
 
+    public Medicine() {
+    }
+
+    private Medicine(Parcel in) {
+        this.groupId = in.readLong();
+        this.name = in.readString();
+        this.description = in.readString();
+        this.link = in.readString();
+        this.typeId = in.readLong();
+        this.amount = in.readInt();
+        this.expireAt = new Date(in.readLong());
+    }
+
     @Override
     public int compareTo(@NonNull Medicine medicine) {
         return this.name.compareTo(medicine.name);
+    }
+
+    public static final Parcelable.Creator<Medicine> CREATOR = new Parcelable.Creator<Medicine>() {
+
+        public Medicine createFromParcel(Parcel in) {
+            return new Medicine(in);
+        }
+
+        public Medicine[] newArray(int size) {
+            return new Medicine[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeLong(groupId);
+        parcel.writeString(name);
+        parcel.writeString(description);
+        parcel.writeString(link);
+        parcel.writeLong(typeId);
+        parcel.writeInt(amount);
+        parcel.writeLong(expireAt.getTime());
     }
 
     /**

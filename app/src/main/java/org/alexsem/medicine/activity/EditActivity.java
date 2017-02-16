@@ -25,6 +25,7 @@ import org.alexsem.medicine.adapter.MedicineGroupAdapter;
 import org.alexsem.medicine.adapter.MedicineMonthAdapter;
 import org.alexsem.medicine.adapter.MedicineTypeAdapter;
 import org.alexsem.medicine.adapter.MedicineYearAdapter;
+import org.alexsem.medicine.model.Medicine;
 import org.alexsem.medicine.transfer.MedicineProvider;
 
 import java.text.ParseException;
@@ -35,6 +36,7 @@ public class EditActivity extends AppCompatActivity {
 
     public static final String EXTRA_MEDICINE_ID = "medicineId";
     public static final String EXTRA_GROUP_ID = "groupId";
+    public static final String EXTRA_MEDICINE = "medicine";
     public static final int RESULT_GROUP_ADDED = RESULT_FIRST_USER + 1;
     public static final int RESULT_ITEM_CHANGED = RESULT_FIRST_USER + 2;
 
@@ -98,6 +100,28 @@ public class EditActivity extends AppCompatActivity {
             mYear.setSelection(savedInstanceState.getInt("year") - mYearAdapter.MIN_YEAR);
             mDescription.setText(savedInstanceState.getString("description"));
             mLink.setText(savedInstanceState.getString("link"));
+        } else if (getIntent().hasExtra(EXTRA_MEDICINE)) {
+            Medicine medicine = getIntent().getExtras().getParcelable(EditActivity.EXTRA_MEDICINE);
+            for (int i = 0; i < mGroupAdapter.getCount(); i++) {
+                if (mGroupAdapter.getItemId(i) == medicine.getGroupId()) {
+                    mGroup.setSelection(i);
+                    break;
+                }
+            }
+            mName.setText(medicine.getName());
+            for (int i = 0; i < mTypeAdapter.getCount(); i++) {
+                if (mTypeAdapter.getItemId(i) == medicine.getTypeId()) {
+                    mType.setSelection(i);
+                    break;
+                }
+            }
+            mAmount.setText(String.valueOf(medicine.getAmount()));
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(medicine.getExpireAt());
+            mMonth.setSelection(cal.get(Calendar.MONTH));
+            mYear.setSelection(cal.get(Calendar.YEAR) - mYearAdapter.MIN_YEAR);
+            mDescription.setText(medicine.getDescription());
+            mLink.setText(medicine.getLink());
         } else if (getIntent().hasExtra(EXTRA_MEDICINE_ID)) {
             getSupportLoaderManager().initLoader(0, getIntent().getExtras(), mLoaderCallbacks);
         }
